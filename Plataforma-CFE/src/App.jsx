@@ -1,6 +1,7 @@
 // src/App.jsx
 import { Routes, Route } from "react-router-dom";
 import Dashboard from "./modules/Dashboard";
+import AddUser from "./modules/users/AddUser";
 
 function App() {
     return (
@@ -9,6 +10,7 @@ function App() {
             <div className="flex-1 ml-64 p-4">
                 <Routes>
                     <Route path="/" element={<Dashboard />} />
+                    <Route path="/usuario" element={<AddUser />} />
                 </Routes>
             </div>
         </div>

@@ -1,4 +1,4 @@
-import { FaFileAlt, FaTable, FaUserAlt } from 'react-icons/fa';
+import { FaFileAlt, FaTable, FaUserAlt} from 'react-icons/fa';
 
 export default [
   {
@@ -15,5 +15,5 @@ export default [
     label: "Administrador de usuarios",
     link: "/usuario",
     icon: FaUserAlt
-  }
+  },
 ];
