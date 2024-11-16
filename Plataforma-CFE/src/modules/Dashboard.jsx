@@ -10,6 +10,7 @@ const Dashboard = () => {
               key={index}
               className="boton bg-emerald-600 text-white font-bold py-8 px-8 rounded hover:bg-emerald-500 flex flex-col items-center justify-center"
               onClick={() => window.location.href = item.link}
+              style={{ width: '300px', height: '200px' }}
             >
               <item.icon className="w-12 h-12 mb-2 text-white" />
               <span>{item.label}</span>

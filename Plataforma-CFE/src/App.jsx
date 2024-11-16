@@ -5,14 +5,13 @@ import AddUser from "./modules/users/AddUser";
 
 function App() {
     return (
-        <div className="bg-gray-100 text-gray-800 flex">
+        <div className="m-5">
+              <Routes>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/usuario" element={<AddUser />} />
+            </Routes>
 
-            <div className="flex-1 ml-64 p-4">
-                <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/usuario" element={<AddUser />} />
-                </Routes>
-            </div>
+          
         </div>
     );
 }
