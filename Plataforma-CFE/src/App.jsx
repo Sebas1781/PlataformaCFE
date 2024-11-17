@@ -6,11 +6,11 @@ import Sidebar from "./components/includes/Sidebar";
 
 function App() {
     return (
-        <div className="m-5 flex">
-            <div style={{ width: '16rem', flexShrink: 0 }}>
+        <div className="relative m-5 flex">
+            <div className="absolute z-10 md:relative md:p-2" style={{ width: '16rem', flexShrink: 0 }}>
                 <Sidebar />
             </div>
-            <div className="flex-grow m-5">
+            <div className="flex-grow m-8 ml-5 md:ml-0">
                 <Routes>
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/usuario" element={<AddUser />} />

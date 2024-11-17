@@ -1,6 +1,5 @@
-import { FaHome, FaTable, FaUser, FaUsers } from "react-icons/fa";
-
-const sidebarConfig = [
+import { FaHome, FaTable, FaUser, FaUsers, FaSignOutAlt } from "react-icons/fa";
+export const sidebarConfig = [
   {
     name: "Dashboard",
     icon: FaHome,
@@ -20,7 +19,10 @@ const sidebarConfig = [
     name: "Usuarios",
     icon: FaUsers,
     link: "/usuarios",
+  },
+  {
+    name:"Cerrar Sesión",
+    icon: FaSignOutAlt,
+    link:"/cerrarSesion",
   }
 ];
-
-export default sidebarConfig;
