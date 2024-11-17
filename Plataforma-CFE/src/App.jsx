@@ -3,6 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Dashboard from "./modules/Dashboard";
 import AddUser from "./modules/users/AddUser";
 import Sidebar from "./components/includes/Sidebar";
+import Formulario from "./modules/Formulario";
 
 function App() {
     return (
@@ -14,6 +15,7 @@ function App() {
                 <Routes>
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/usuario" element={<AddUser />} />
+                    <Route path="/reportes" element={<Formulario />} />
                 </Routes>
             </div>
         </div>
