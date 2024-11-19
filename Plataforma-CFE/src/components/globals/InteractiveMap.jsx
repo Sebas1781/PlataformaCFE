@@ -42,9 +42,9 @@ const InteractiveMap = () => {
         <label className="sm:ml-4">
           Longitud:
           <input type="text" value={latLng.lng} readOnly className="ml-2 p-1 border rounded" />
-        </label>
-      </div>
-    </div>
+            </label>
+            </div>
+         </div>
   );
 }
 

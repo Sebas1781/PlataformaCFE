@@ -1,7 +1,7 @@
 // src/modules/reports/Formulario.jsx
 import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
-import GlobalTables from '../../components/globals/globalTables'; // Importar GlobalForms
+import GlobalTables from '../../components/globals/GlobalTables'; // Importar GlobalForms
 import { columnsConfig, testData } from '../../data/userConfig'; // Importar configuración y datos de prueba
 
 const Users = () => {

@@ -3,7 +3,7 @@ import { Routes, Route } from "react-router-dom";
 import Dashboard from "./modules/Dashboard";
 import AddUser from "./modules/users/AddUser";
 import Sidebar from "./components/includes/Sidebar";
-import Formulario from "./modules/reports/Formulario";
+import FormTable from "./modules/reports/FormTable";
 import Users from './modules/users/Users'; 
 import InteractiveMap from './components/globals/InteractiveMap';
 
@@ -22,7 +22,7 @@ function App() {
                     <Route path="/usuario" element={<AddUser />} />
                     <Route 
                         path="/reportes" 
-                        element={<Formulario formData={formData} setFormData={setFormData} />} 
+                        element={<FormTable formData={formData} setFormData={setFormData} />} 
                     />
                     <Route 
                         path="/usuarios" 
