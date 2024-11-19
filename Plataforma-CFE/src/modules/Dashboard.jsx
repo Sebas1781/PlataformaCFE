@@ -1,4 +1,6 @@
 import dashboardConfig from '../data/dashboardConfig';
+import InteractiveMap from '../components/globals/InteractiveMap';
+
 const Dashboard = () => {
     return (
       <div className="text-center">
@@ -17,6 +19,9 @@ const Dashboard = () => {
             </button>
           ))}
         </div>
+        {/* <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6 p-4 justify-center items-center flex-grow">
+                    <InteractiveMap />
+                </div> */}
       </div>
     );
   };

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Routes, Route } from "react-router-dom";
 import Dashboard from "./modules/Dashboard";
@@ -6,15 +5,17 @@ import AddUser from "./modules/users/AddUser";
 import Sidebar from "./components/includes/Sidebar";
 import Formulario from "./modules/reports/Formulario";
 import Users from './modules/users/Users'; 
+import InteractiveMap from './components/globals/InteractiveMap';
 
 function App() {
-    const [formData, setFormData] = useState({});
+    const [formData, setFormData] = useState([]); // Inicializar como array vacío
 
     return (
-        <div className="relative m-5 flex">
-            <div className="absolute z-10 md:relative md:p-2" style={{ width: '16rem', flexShrink: 0 }}>
+        <div className="relative m-6 flex flex-col md:flex-row">
+            <div className="absolute md:relative z-10 md:z-auto md:p-2" style={{ width: '16rem', flexShrink: 0 }}>
                 <Sidebar />
             </div>
+            
             <div className="flex-grow m-8 ml-5 md:ml-0">
                 <Routes>
                     <Route path="/" element={<Dashboard />} />
@@ -28,6 +29,8 @@ function App() {
                         element={<Users formData={formData} setFormData={setFormData} />} 
                     />
                 </Routes>
+
+               
             </div>
         </div>
     );
