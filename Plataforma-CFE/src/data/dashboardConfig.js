@@ -3,7 +3,7 @@ import { FaFileAlt, FaTable, FaUserAlt} from 'react-icons/fa';
 export default [
   {
     label: "Generar nuevo reporte",
-    link: "/formulario",
+    link: "/reportes",
     icon: FaFileAlt
   },
   {
@@ -13,7 +13,7 @@ export default [
   },
   {
     label: "Administrador de usuarios",
-    link: "/usuario",
+    link: "/usuarios",
     icon: FaUserAlt
   },
 ];

@@ -2,9 +2,9 @@
 import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 import GlobalTables from '../../components/globals/globalTables'; // Importar GlobalForms
-import { columnsConfig, testData } from '../../data/dataTable'; // Importar configuración y datos de prueba
+import { columnsConfig, testData } from '../../data/userConfig'; // Importar configuración y datos de prueba
 
-const Formulario = () => {
+const Users = () => {
     const [formData, setFormData] = useState([]);
 
     // Cargar datos de prueba al inicializar
@@ -20,9 +20,9 @@ const Formulario = () => {
     );
 };
 
-Formulario.propTypes = {
+Users.propTypes = {
     formData: PropTypes.arrayOf(PropTypes.object),
     setFormData: PropTypes.func,
 };
 
-export default Formulario;
+export default Users;
