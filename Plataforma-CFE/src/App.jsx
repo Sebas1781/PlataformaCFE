@@ -5,7 +5,7 @@ import AddUser from "./modules/users/AddUser";
 import Sidebar from "./components/includes/Sidebar";
 import FormTable from "./modules/reports/FormTable";
 import Users from './modules/users/Users'; 
-import InteractiveMap from './components/globals/InteractiveMap';
+import GlobalForms from './components/globals/GlobalForms'; // Corrected import path
 
 function App() {
     const [formData, setFormData] = useState([]); // Inicializar como array vacío
@@ -27,10 +27,14 @@ function App() {
                     <Route 
                         path="/usuarios" 
                         element={<Users formData={formData} setFormData={setFormData} />} 
+                        />
+                   
+                   <Route 
+                        path="/formulario-reporte" 
+                        element={<GlobalForms formData={formData} setFormData={setFormData} />} 
                     />
-                </Routes>
 
-               
+                </Routes>
             </div>
         </div>
     );
