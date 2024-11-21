@@ -5,6 +5,7 @@ import AddUser from "./modules/users/AddUser";
 import Sidebar from "./components/includes/Sidebar";
 import FormTable from "./modules/reports/FormTable";
 import Users from './modules/users/Users'; 
+import Profile from './modules/profile/Profile';
 import GlobalForms from './components/globals/GlobalForms'; // Corrected import path
 
 function App() {
