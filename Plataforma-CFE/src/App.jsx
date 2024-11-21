@@ -5,6 +5,7 @@ import AddUser from "./modules/users/AddUser";
 import Sidebar from "./components/includes/Sidebar";
 import FormTable from "./modules/reports/FormTable";
 import Users from './modules/users/Users'; 
+import Profile from './modules/profile/Profile';
 import InteractiveMap from './components/globals/InteractiveMap';
 
 function App() {
@@ -28,6 +29,10 @@ function App() {
                         path="/usuarios" 
                         element={<Users formData={formData} setFormData={setFormData} />} 
                     />
+                    <Route
+                        path="/perfil"
+                        element={<Profile formData={formData} setFormData={setFormData} />}
+                    ></Route>
                 </Routes>
 
                
