@@ -8,7 +8,8 @@ const GlobalTables = ({ columns, data }) => {
     }
 
     return (
-        <div className="max-w-[900px] mx-auto"> {/* Reduced max-width from 720px to 600px */}
+        
+        <div className="max-w-[900px] mx-auto "> {/* Added margin-top */}
             <div className="relative flex flex-col w-full h-full text-slate-700 bg-white shadow-md rounded-xl bg-clip-border">
                 <div className="relative mx-4 mt-4 overflow-hidden text-slate-700 bg-white rounded-none bg-clip-border">
                     <div className="flex items-center justify-between">

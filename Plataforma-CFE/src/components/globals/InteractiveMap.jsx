@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { GoogleMap, LoadScript, Marker } from '@react-google-maps/api';
+import React, { useState, useCallback, useEffect, forwardRef, useImperativeHandle, useRef } from 'react';
+import { GoogleMap } from '@react-google-maps/api';
 import { FaLocationArrow } from 'react-icons/fa'; // Import the location icon
 
 const containerStyle = {
@@ -12,20 +12,33 @@ const center = {
   lng: -98.75894980668329,
 };
 
-const InteractiveMap = ({ onChange }) => {
-  const [marker, setMarker] = useState(null);
-  const [latLng, setLatLng] = useState({ lat: '', lng: '' });
+const InteractiveMap = forwardRef(({ onChange, initialLatLng }, ref) => {
+  const [marker, setMarker] = useState(initialLatLng || null);
+  const [latLng, setLatLng] = useState(initialLatLng || { lat: '', lng: '' });
+  const mapRef = useRef(null);
+  const markerRef = useRef(null);
+
+  useEffect(() => {
+    if (initialLatLng) {
+      setMarker(initialLatLng);
+      setLatLng(initialLatLng);
+    }
+  }, [initialLatLng]);
+
+  useImperativeHandle(ref, () => ({
+    getLatLng: () => latLng,
+  }));
 
   const onMapClick = useCallback(
     (event) => {
-      const lat = event.latLng.lat();
-      const lng = event.latLng.lng();
-      setMarker({ lat, lng });
-      setLatLng({ lat, lng });
-
-      // Comunica las coordenadas al componente padre
+      const newLatLng = {
+        lat: event.latLng.lat(),
+        lng: event.latLng.lng(),
+      };
+      setMarker(newLatLng);
+      setLatLng(newLatLng);
       if (onChange) {
-        onChange({ lat, lng });
+        onChange(newLatLng);
       }
     },
     [onChange]
@@ -33,57 +46,66 @@ const InteractiveMap = ({ onChange }) => {
 
   const handleGetLocation = () => {
     if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-          setMarker({ lat, lng });
-          setLatLng({ lat, lng });
-
-          if (onChange) {
-            onChange({ lat, lng });
-          }
-        },
-        (error) => {
-          console.error('Error getting location:', error);
+      navigator.geolocation.getCurrentPosition((position) => {
+        const newLatLng = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        setMarker(newLatLng);
+        setLatLng(newLatLng);
+        if (onChange) {
+          onChange(newLatLng);
         }
-      );
-    } else {
-      console.error('Geolocation is not supported by this browser.');
+      });
     }
   };
 
+  useEffect(() => {
+    if (mapRef.current && marker) {
+      const map = mapRef.current;
+
+      if (markerRef.current) {
+        markerRef.current.setMap(null);
+      }
+
+      markerRef.current = new google.maps.Marker({
+        position: marker,
+        map: map,
+        title: 'Selected Location',
+      });
+    }
+  }, [marker]);
+
   return (
-    <div className="flex justify-center items-center flex-col">
-      <LoadScript googleMapsApiKey="AIzaSyC-g_SwMSxKdoeYDhbXPdgC6VFBSnf3yJo">
-        <GoogleMap
-          mapContainerStyle={containerStyle}
-          center={center}
-          zoom={10}
-          onClick={onMapClick}
-        >
-          {marker && <Marker position={marker} />}
-        </GoogleMap>
-      </LoadScript>
-      <div className="mt-4 flex flex-col sm:flex-row">
-        <label className="mb-2 sm:mb-0">
-          Latitud:
-          <input type="text" value={latLng.lat} readOnly className="ml-2 p-1 border rounded" />
-        </label>
-        <label className="sm:ml-4">
-          Longitud:
-          <input type="text" value={latLng.lng} readOnly className="ml-2 p-1 border rounded" />
-        </label>
+    <div>
+      <GoogleMap
+        mapContainerStyle={containerStyle}
+        center={center}
+        zoom={10}
+        onClick={onMapClick}
+        onLoad={map => mapRef.current = map}
+      />
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mt-4">
+        <div className="flex flex-col sm:flex-row sm:items-center">
+          <span>Latitud:</span>
+          <input type="text" value={latLng.lat} readOnly className="ml-2 p-1 border rounded w-full sm:w-auto" />
+        </div>
+        <div className="flex flex-col sm:flex-row sm:items-center mt-2 sm:mt-0">
+          <span>Longitud:</span>
+          <input type="text" value={latLng.lng} readOnly className="ml-2 p-1 border rounded w-full sm:w-auto" />
+        </div>
       </div>
-      <button
-        onClick={handleGetLocation}
-        className="mt-4 p-2 bg-emerald-600 text-white rounded flex items-center"
-      >
-        <FaLocationArrow className="mr-2" />
-        Obtener Ubicación
-      </button>
+      <div className="flex justify-center mt-4">
+        <button
+          onClick={handleGetLocation}
+          className="p-2 bg-emerald-600 text-white rounded flex items-center"
+        >
+          <FaLocationArrow className="mr-2" />
+          Obtener Ubicación
+        </button>
+      </div>
     </div>
   );
-};
+});
 
 export default InteractiveMap;
