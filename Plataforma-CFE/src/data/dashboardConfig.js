@@ -16,4 +16,5 @@ export default [
     link: "/usuarios",
     icon: FaUserAlt
   },
+
 ];
