@@ -9,7 +9,7 @@ import Users from './modules/users/Users';
 import Profile from './modules/profile/Profile';
 import GlobalForms from './components/globals/GlobalForms'; // Corrected import path
 import CustomNotification from './components/globals/CustomNotification';
-import EditUsers from './components/globals/EditUsers';
+import FormInput from './components/globals/FormInput';
 
 function App() {
     const [formData, setFormData] = useState([]); // Inicializar como array vacío
@@ -43,10 +43,10 @@ function App() {
                             path="/formulario-reporte" 
                             element={<GlobalForms formData={formData} setFormData={setFormData} setNotification={setNotification} notification={notification} />} 
                         />
-
-                        <Route 
-                            path="/editusers" 
-                            element={<EditUsers formData={formData} setFormData={setFormData} setNotification={setNotification} notification={notification} />} 
+                       
+                       <Route 
+                            path="/perfil" 
+                            element={<Profile formData={formData }/>} 
                         />
                     </Routes>
                 </div>
