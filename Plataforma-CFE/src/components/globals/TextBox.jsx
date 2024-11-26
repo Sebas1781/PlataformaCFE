@@ -1,4 +1,3 @@
-
 import PropTypes from 'prop-types';
 
 const Textbox = ({ label, name, value, onChange }) => (
