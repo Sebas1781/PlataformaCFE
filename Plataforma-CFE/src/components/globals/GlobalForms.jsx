@@ -101,16 +101,18 @@ const GlobalForms = ({ setNotification, notification }) => {
         Object.entries(formData).forEach(([sectionName, sectionFields]) => {
             console.log(`Sección: ${sectionName}`); // Log section name
             Object.entries(sectionFields).forEach(([key, value]) => {
-                const field = reportForm.find(section => section.sectionName === sectionName).fields.find(f => f.name === key);
-                if (key === 'fotoPerfil' && value instanceof File) {
-                    // Si es un archivo, lo agregamos al FormData
+                const section = reportForm.find(section => section.sectionName === sectionName);
+                const field = section ? section.fields.find(f => f.name === key) : null;
+                if (field && field.type === 'image' && value instanceof File) {
+                    // Si es un archivo de imagen, lo agregamos al FormData
                     formDataToSend.append(key, value);
+                    console.log(`${key}:`, { name: value.name, type: value.type, size: value.size }); // Log file details
                 } else {
                     // Si es un campo normal, lo agregamos como texto
                     const fieldValue = typeof value === 'object' ? JSON.stringify(value) : value;
-                    formDataToSend.append(key, field.unit ? `${fieldValue} ${field.unit}` : fieldValue);
+                    formDataToSend.append(key, field && field.unit ? `${fieldValue} ${field.unit}` : fieldValue);
+                    console.log(`${key}: ${value}`); // Log field key and value
                 }
-                console.log(`${key}: ${value}`); // Log field key and value
             });
         });
 
@@ -167,11 +169,15 @@ const GlobalForms = ({ setNotification, notification }) => {
                             onChange={e => handleInputChange(sectionName, e.target.name, e.target.value)}
                             className="pt-3 pb-2 block w-full px-0 mt-0 bg-transparent border-0 border-b-2 appearance-none focus:outline-none focus:ring-0 focus:border-emerald-600 border-gray-200 sm:text-sm"
                             readOnly={field.readOnly || false} // Asegurarse de que VSWR sea de solo lectura
+                            id={`input_${sectionName}_${field.name}`} // Add id for label to reference
                         />
                         {field.unit && (
                             <div className="absolute top-0 right-0 mt-3 mr-4 text-gray-400">{field.unit}</div>
                         )}
-                        <label className={`absolute duration-300 top-3 -z-1 origin-0 text-gray-500 ${isFilled ? 'scale-75 -translate-y-6 text-emerald-600' : ''}`}>
+                        <label
+                            htmlFor={`input_${sectionName}_${field.name}`} // Add htmlFor to link label to input
+                            className={`absolute duration-300 top-3 -z-1 origin-0 text-gray-500 ${isFilled ? 'scale-75 -translate-y-6 text-emerald-600' : ''}`}
+                        >
                             {field.label}
                         </label>
                     </div>
@@ -231,29 +237,34 @@ const GlobalForms = ({ setNotification, notification }) => {
                         </label>
                     </div>
                 );
-                case 'image':
-                    return (
-                        <div className="relative z-0 w-full mb-5">
-                            <div className="flex flex-col items-center space-y-4 justify-center">
-                                <div className="shrink-0 mt-4">
-                                    <img id="preview_img" className="h-16 w-16 object-cover rounded-full" src={PreviewImage} alt="Current profile photo" />
-                                </div>
-                                <label className="block text-xl">
-                                    <span className="sr-only">Choose profile photo</span>
-                                    <input
-                                        type="file"
-                                        name={field.name}
-                                        onChange={e => {
-                                            handleInputChange(sectionName, e.target.name, e.target.files[0]);
-                                            loadFile(e);
-                                        }}
-                                        className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-200"
-                                    />
-                                </label>
+            case 'image':
+                return (
+                    <div className="relative z-0 w-full mb-5">
+                        <div className="flex flex-col items-center space-y-4 justify-center">
+                            <div className="shrink-0 mt-4">
+                                <img
+                                    id={`preview_img_${sectionName}_${field.name}`}
+                                    className="h-16 w-16 object-cover rounded-full"
+                                    src={formData[sectionName]?.[field.name] ? URL.createObjectURL(formData[sectionName][field.name]) : PreviewImage}
+                                    alt="Current profile photo"
+                                />
                             </div>
-                            <label className="absolute duration-300 top-3 -z-1 origin-0 text-gray-500 scale-75 -translate-y-6 text-emerald-600">{field.label}</label>
+                            <label className="block text-xl">
+                                <span className="sr-only">Choose profile photo</span>
+                                <input
+                                    type="file"
+                                    name={field.name}
+                                    onChange={e => {
+                                        handleInputChange(sectionName, e.target.name, e.target.files[0]);
+                                        loadFile(e, sectionName, field.name);
+                                    }}
+                                    className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-200"
+                                />
+                            </label>
                         </div>
-                    );
+                        <label className="absolute duration-300 top-3 -z-1 origin-0 text-gray-500 scale-75 -translate-y-6 text-emerald-600">{field.label}</label>
+                    </div>
+                );
             case 'textarea':
                 return (
                     <div className="relative z-0 w-full mb-5">
@@ -272,63 +283,63 @@ const GlobalForms = ({ setNotification, notification }) => {
                 );
             case 'map':
                 return <InteractiveMap ref={mapRef} onChange={coords => handleInputChange(sectionName, 'ubicacionMapa', coords)} initialLatLng={initialLatLng || formData[sectionName]?.ubicacionMapa} />;
-                case 'range':
-                    return (
-                        <div className="relative z-0 w-full mb-5">
-                            <label className="block text-gray-500 mb-2 text-emerald-600">
-                                {field.label}
-                            </label>
-                            <input
-                                type="range"
-                                name={field.name}
-                                min={field.min}
-                                max={field.max}
-                                value={isFilled || field.min}
-                                onChange={e => handleInputChange(sectionName, e.target.name, e.target.value)}
-                                className="w-full bg-transparent cursor-pointer appearance-none disabled:opacity-50 disabled:pointer-events-none focus:outline-none
-                                [&::-webkit-slider-thumb]:w-2.5
-                                [&::-webkit-slider-thumb]:h-2.5
-                                [&::-webkit-slider-thumb]:-mt-0.5
-                                [&::-webkit-slider-thumb]:appearance-none
-                                [&::-webkit-slider-thumb]:bg-white
-                                [&::-webkit-slider-thumb]:shadow-[0_0_0_4px_rgba(16,185,129,1)]
-                                [&::-webkit-slider-thumb]:rounded-full
-                                [&::-webkit-slider-thumb]:transition-all
-                                [&::-webkit-slider-thumb]:duration-150
-                                [&::-webkit-slider-thumb]:ease-in-out
-                                [&::-moz-range-thumb]:w-2.5
-                                [&::-moz-range-thumb]:h-2.5
-                                [&::-moz-range-thumb]:appearance-none
-                                [&::-moz-range-thumb]:bg-white
-                                [&::-moz-range-thumb]:border-4
-                                [&::-moz-range-thumb]:border-emerald-600
-                                [&::-moz-range-thumb]:rounded-full
-                                [&::-moz-range-thumb]:transition-all
-                                [&::-moz-range-thumb]:duration-150
-                                [&::-moz-range-thumb]:ease-in-out
-                                [&::-webkit-slider-runnable-track]:w-full
-                                [&::-webkit-slider-runnable-track]:h-2
-                                [&::-webkit-slider-runnable-track]:bg-gray-100
-                                [&::-webkit-slider-runnable-track]:rounded-full
-                                [&::-moz-range-track]:w-full
-                                [&::-moz-range-track]:h-2
-                                [&::-moz-range-track]:bg-gray-100
-                                [&::-moz-range-track]:rounded-full"
-                                id="basic-range-slider-usage"
-                                aria-orientation="horizontal"
-                            />
-                            <span className="block text-sm text-gray-500">Valor: {isFilled || field.min}</span>
-                        </div>
-                    );
+            case 'range':
+                return (
+                    <div className="relative z-0 w-full mb-5">
+                        <label className="block text-gray-500 mb-2 text-emerald-600">
+                            {field.label}
+                        </label>
+                        <input
+                            type="range"
+                            name={field.name}
+                            min={field.min}
+                            max={field.max}
+                            value={isFilled || field.min}
+                            onChange={e => handleInputChange(sectionName, e.target.name, e.target.value)}
+                            className="w-full bg-transparent cursor-pointer appearance-none disabled:opacity-50 disabled:pointer-events-none focus:outline-none
+                            [&::-webkit-slider-thumb]:w-2.5
+                            [&::-webkit-slider-thumb]:h-2.5
+                            [&::-webkit-slider-thumb]:-mt-0.5
+                            [&::-webkit-slider-thumb]:appearance-none
+                            [&::-webkit-slider-thumb]:bg-white
+                            [&::-webkit-slider-thumb]:shadow-[0_0_0_4px_rgba(16,185,129,1)]
+                            [&::-webkit-slider-thumb]:rounded-full
+                            [&::-webkit-slider-thumb]:transition-all
+                            [&::-webkit-slider-thumb]:duration-150
+                            [&::-webkit-slider-thumb]:ease-in-out
+                            [&::-moz-range-thumb]:w-2.5
+                            [&::-moz-range-thumb]:h-2.5
+                            [&::-moz-range-thumb]:appearance-none
+                            [&::-moz-range-thumb]:bg-white
+                            [&::-moz-range-thumb]:border-4
+                            [&::-moz-range-thumb]:border-emerald-600
+                            [&::-moz-range-thumb]:rounded-full
+                            [&::-moz-range-thumb]:transition-all
+                            [&::-moz-range-thumb]:duration-150
+                            [&::-moz-range-thumb]:ease-in-out
+                            [&::-webkit-slider-runnable-track]:w-full
+                            [&::-webkit-slider-runnable-track]:h-2
+                            [&::-webkit-slider-runnable-track]:bg-gray-100
+                            [&::-webkit-slider-runnable-track]:rounded-full
+                            [&::-moz-range-track]:w-full
+                            [&::-moz-range-track]:h-2
+                            [&::-moz-range-track]:bg-gray-100
+                            [&::-moz-range-track]:rounded-full"
+                            id="basic-range-slider-usage"
+                            aria-orientation="horizontal"
+                        />
+                        <span className="block text-sm text-gray-500">Valor: {isFilled || field.min}</span>
+                    </div>
+                );
             default:
                 return null;
         }
     };
 
-    const loadFile = (event) => {
+    const loadFile = (event, sectionName, fieldName) => {
         const input = event.target;
         const file = input.files[0];
-        const output = document.getElementById('preview_img');
+        const output = document.getElementById(`preview_img_${sectionName}_${fieldName}`);
         
         output.src = URL.createObjectURL(file);
         output.onload = () => {
