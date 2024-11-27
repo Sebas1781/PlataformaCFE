@@ -1,6 +1,7 @@
 // src/components/globals/GlobalTables.jsx
 import React from 'react';
 import PropTypes from 'prop-types';
+import { FaEdit, FaTrashAlt } from 'react-icons/fa';
 
 const GlobalTables = ({ columns, data }) => {
     if (data.length === 0) {
@@ -8,20 +9,18 @@ const GlobalTables = ({ columns, data }) => {
     }
 
     return (
-        
-        <div className="max-w-[900px] mx-auto "> {/* Added margin-top */}
+        <div className="max-w-[900px] mx-auto">
             <div className="relative flex flex-col w-full h-full text-slate-700 bg-white shadow-md rounded-xl bg-clip-border">
                 <div className="relative mx-4 mt-4 overflow-hidden text-slate-700 bg-white rounded-none bg-clip-border">
                     <div className="flex items-center justify-between">
-                        <div>
-                        </div>
+                        <div></div>
+                        {/* Botón verde de Imprimir Reporte */}
                         <div className="flex flex-col gap-2 shrink-0 sm:flex-row">
-
                             <button className="flex items-center gap-2 rounded bg-emerald-600 py-2.5 px-4 text-xs font-semibold text-white shadow-md hover:shadow-lg">
                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                                    <path d="M6.25 6.375a4.125 4.125 0 118.25 0 4.125 4.125 0 01-8.25 0zM3.25 19.125a7.125 7.125 0 0114.25 0v.003l-.001.119a.75.75 0 01-.363.63 13.067 13.067 0 01-6.761 1.873c-2.472 0-4.786-.684-6.76-1.873a.75.75 0 01-.364-.63l-.001-.122zM19.75 7.5a.75.75 0 00-1.5 0v2.25H16a.75.75 0 000 1.5h2.25v2.25a.75.75 0 001.5 0v-2.25H22a.75.75 0 000-1.5h-2.25V7.5z"></path>
+                                    <path d="M19.5 6.75h-15a3 3 0 00-3 3v9.75a3 3 0 003 3h15a3 3 0 003-3V9.75a3 3 0 00-3-3zm1.5 12.75a1.5 1.5 0 01-1.5 1.5h-15a1.5 1.5 0 01-1.5-1.5V9.75a1.5 1.5 0 011.5-1.5h15a1.5 1.5 0 011.5 1.5zm-4.5-9H18v-1.5h1.5z"></path>
                                 </svg>
-                                Add member
+                                Imprimir Reporte
                             </button>
                         </div>
                     </div>
@@ -37,9 +36,6 @@ const GlobalTables = ({ columns, data }) => {
                                     >
                                         <p className="flex items-center justify-between gap-2 font-sans text-sm font-normal text-slate-500">
                                             {column.label}
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-4 h-4">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"></path>
-                                            </svg>
                                         </p>
                                     </th>
                                 ))}
@@ -48,11 +44,54 @@ const GlobalTables = ({ columns, data }) => {
                         <tbody>
                             {data.map((row, rowIndex) => (
                                 <tr key={rowIndex} className="hover:bg-gray-100">
-                                    {columns.map((column, colIndex) => (
-                                        <td key={colIndex} className="p-4 border-b border-slate-200">
-                                            {row[column.field] || '-'}
-                                        </td>
-                                    ))}
+                                    {columns.map((column, colIndex) => {
+                                        if (column.field === "actions") {
+                                            // Renderizar los botones de acciones (Editar y Eliminar)
+                                            return (
+                                                <td key={colIndex} className="p-4 border-b border-slate-200">
+                                                    <div className="flex gap-2">
+                                                        {/* Botón de Editar */}
+                                                        <button
+                                                            className="text-yellow-500 hover:text-yellow-600"
+                                                            title="Editar"
+                                                        >
+                                                            <FaEdit />
+                                                        </button>
+                                                        {/* Botón de Eliminar */}
+                                                        <button
+                                                            className="text-red-500 hover:text-red-600"
+                                                            title="Eliminar"
+                                                        >
+                                                            <FaTrashAlt />
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            );
+                                        }
+
+                                        if (column.field === "fullName") {
+                                            // Renderizar el nombre completo y el cuadro desplegable
+                                            return (
+                                                <td key={colIndex} className="p-4 border-b border-slate-200">
+                                                    <div>
+                                                        <p>{row[column.field]}</p>
+                                                        <select className="mt-2 w-full border border-gray-300 rounded-md px-2 py-1 text-sm">
+                                                            <option value="reporte1">Reporte 1</option>
+                                                            <option value="reporte2">Reporte 2</option>
+                                                            <option value="reporte3">Reporte 3</option>
+                                                        </select>
+                                                    </div>
+                                                </td>
+                                            );
+                                        }
+
+                                        // Renderizar el resto de las columnas
+                                        return (
+                                            <td key={colIndex} className="p-4 border-b border-slate-200">
+                                                {row[column.field] || "-"}
+                                            </td>
+                                        );
+                                    })}
                                 </tr>
                             ))}
                         </tbody>

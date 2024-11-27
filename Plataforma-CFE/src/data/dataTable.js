@@ -1,15 +1,16 @@
 export const columnsConfig = [
-    { label: 'Nombre', field: 'name' },
-    { label: 'Elaborado por', field: 'surname' },
-    { label: 'Fecha de creacion', field: 'email' },
-    { label: 'Fecha de modificacion', field: 'email' },
-    { label: 'Acciones', field: 'email' },
+    { label: 'Elaborado por', field: 'fullName' }, // Nueva columna combinada
+    { label: 'Fecha de creación', field: 'creationDate' },
+    { label: 'Fecha de modificación', field: 'modificationDate' },
+    { label: 'Acciones', field: 'actions' },
 ];
 
+
 export const testData = [
-    { name: 'Juan', surname: 'Pérez', email: 'juan.perez@example.com' },
-    { name: 'Ana', surname: 'Gómez', email: 'ana.gomez@example.com' },
-    { name: 'Luis', surname: 'Martínez', email: 'luis.martinez@example.com' },
+    { fullName: 'Juan Pérez', creationDate: '2024-11-01', modificationDate: '2024-11-10' },
+    { fullName: 'Ana Gómez', creationDate: '2024-11-02', modificationDate: '2024-11-11' },
+    { fullName: 'Luis Martínez', creationDate: '2024-11-03', modificationDate: '2024-11-12' },
 ];
+
 
 
