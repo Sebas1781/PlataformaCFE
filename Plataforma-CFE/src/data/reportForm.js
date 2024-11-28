@@ -11,7 +11,8 @@ const reportForm = [
             { label: 'Licencia:', name: 'licencia', type: 'number', placeholder: 'Licencia', required: true },
             { label: 'Registro:', name: 'registro', type: 'number', placeholder: 'Regisgtro', required: true },
             { label: 'Restaurador:', name: 'restaurador', type: 'number', placeholder: 'Restaurador', required: true },
-            { label: 'Circuito:', name: 'circuito', type: 'select', options: ['Opcion 1', 'Opcion 2', 'Opcion 3', 'Opcion 4', 'Opcion 5'], required: true },
+            { label: 'Circuito:', name: 'circuito', type: 'select', options: ['Opcion 1', 'Opcion 2', 'Opcion 3', 'Opcion 4', ''], required: true },
+            { label: 'Area:', name: 'area', type: 'select', options: ['Pachuca', 'Actopan', 'Cubitos', 'Tizayuca'], required: true },
             { label: 'Ubicación en el mapa', name: 'ubicacionMapa', type: 'map', required: true }, // Campo de mapa
             { label: 'Dirección', name: 'direccion', type: 'text', required: true },
             // { label: 'Potencia Incidente', name: 'potenciaIncidente', type: 'number', required: true },
@@ -25,8 +26,8 @@ const reportForm = [
             
             { label: 'Radio / Gabinete:', name: 'nsRadioGabinete', type: 'text', required: true },
             { label: 'Potencia de salida (W):', name: 'potenciaSalida', type: 'text', required: true },
-            { label: 'RSSI (dBm):', name: 'rssi', type: 'range', min: -120, max: 0, required: true },
-            { label: 'Umbral de recepción:', name: 'umbralRecepcion', type: 'range', min: -120, max: 0, required: true },
+            { label: 'RSSI (dBm):', name: 'rssi', type: 'range', min: -120, max: -50, required: true },
+            { label: 'Umbral de recepción:', name: 'umbralRecepcion', type: 'range', min: -50, max: 0, required: true },
             { label: 'Frecuencia Mhz:', name: 'frecuencia', type: 'select', options: ['Opcion 1', 'Opcion 2', 'Opcion 3', 'Opcion 4', 'Opcion 5'], required: true },
             { label: 'Rx:', name: 'rx', type: 'select', options: ['0002/0002', '0003/10003', '0004/10004', '0005/10005', '0006/0006','N/A'], required: true },
             { label: 'Tx:', name: 'tx', type: 'select', options: ['0002/0002', '0003/10003', '0004/10004', '0005/10005', '0006/0006','N/A'], required: true },

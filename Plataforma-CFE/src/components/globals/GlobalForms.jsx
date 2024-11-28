@@ -1,13 +1,13 @@
 // src/components/globals/GlobalForms.jsx
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import reportForm from '../../data/reportForm';
 import InteractiveMap from './InteractiveMap';
 import CustomAlert from './CustomAlert'; // Import the custom alert component
 import { useNavigate } from 'react-router-dom'; // Import useNavigate from react-router-dom
 import CustomNotification from './CustomNotification'; // Import the custom notification component
-import PreviewImage from "../../public/preview.png";
+import loginCFE from '../../public/loginCFE.png'; // Ajusta la ruta según tu estructura.
 
-const GlobalForms = ({ setNotification, notification }) => {
+export const GlobalForms = ({ setNotification, notification }) => {
     const [formData, setFormData] = useState({});
     const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
     const [errors, setErrors] = useState([]);
@@ -16,6 +16,10 @@ const GlobalForms = ({ setNotification, notification }) => {
     const [alert, setAlert] = useState({ show: false, message: '', type: '' });
     const navigate = useNavigate(); // Initialize useNavigate
     const fileInputRef = useRef(null); // Add this line
+
+    useEffect(() => {
+        navigate('/login');
+    }, [navigate]);
 
     const currentSection = reportForm[currentSectionIndex];
     const handleInputChange = (sectionName, name, value) => {
@@ -393,4 +397,46 @@ const GlobalForms = ({ setNotification, notification }) => {
     );
 };
 
-export default GlobalForms;
+
+//login
+
+export const FormularioLogin = () => {
+    const navigate = useNavigate(); // Initialize useNavigate
+
+    const handleLogin = (event) => {
+        event.preventDefault();
+        navigate('/dashboard'); // Navigate to /dashboard on login
+    };
+
+    return (
+        <div className="fixed inset-0 bg-white flex justify-center items-center z-50">
+            {/* Left: Image */}
+            <div className="w-1/2 h-full hidden lg:block">
+                <img src={loginCFE} alt="Placeholder Image" className="object-cover w-full h-full" />
+            </div>
+            {/* Right: Login Form */}
+            <div className="lg:p-36 md:p-52 sm:20 p-8 w-full lg:w-1/2 h-full flex items-center justify-center">
+                <div className="w-full">
+                    <h1 className="text-2xl font-semibold mb-4">Iniciar Sesión</h1>
+                    <form onSubmit={handleLogin}>
+                        {/* Username Input */}
+                        <div className="mb-4">
+                            <label htmlFor="username" className="block text-gray-600">Numero de trabajador:</label>
+                            <input type="text" id="username" name="username" className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-emerald-500" autoComplete="off" />
+                        </div>
+                        {/* Password Input */}
+                        <div className="mb-4">
+                            <label htmlFor="password" className="block text-gray-600">Contraseña</label>
+                            <input type="password" id="password" name="password" className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-emerald-500" autoComplete="off" />
+                        </div>
+                        
+                        {/* Login Button */}
+                        <button type="submit" className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-md py-2 px-4 w-full">Iniciar Sesión</button>
+                    </form>
+                    {/* Sign up Link */}
+                
+                </div>
+            </div>
+        </div>
+    );
+};

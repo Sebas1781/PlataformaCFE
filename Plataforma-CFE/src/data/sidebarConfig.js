@@ -3,7 +3,7 @@ export const sidebarConfig = [
   {
     name: "Dashboard",
     icon: FaHome,
-    link: "/",
+    link: "/dashboard",
   },
   {
     name: "Perfil",
