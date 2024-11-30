@@ -112,3 +112,10 @@ export const userFields = [
     { name: "password", label: "Contraseña", type: "password" },
     { name: "confirmPassword", label: "Confirmar Contraseña", type: "password" },
 ];
+
+export const passwordFields = [
+    { name: "contraseñaActual", label: "Contraseña Actual", type: "password" },
+    { name: "nuevaPassword", label: "Nueva Contraseña", type: "password" },
+    { name: "confirmPassword", label: "Confirmar Contraseña", type: "password" },
+    
+];

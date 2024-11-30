@@ -5,8 +5,10 @@ import Sidebar from "./components/includes/Sidebar";
 import NewReport from "./modules/reports/NewReport";
 import AddUser from './modules/users/AddUser';
 import EditUser from './modules/users/EditUser';
+import ProfileDetails from './modules/profile/ProfileDetails';
 
 import { checkBackendConnection } from './system/Config';
+import ChangePassword from './modules/profile/ChangePassword';
 
 function App() {
     checkBackendConnection();
@@ -20,6 +22,8 @@ function App() {
                         <Route path="/nuevo/reporte" element={<NewReport />} />
                         <Route path="/nuevo/usuario" element={<AddUser/>}/>
                         <Route path="/editar/usuario" element={<EditUser/>}/>
+                        <Route path="/perfil" element={<ProfileDetails/>}/>
+                        <Route path="/cambiar/contraseña" element={<ChangePassword/>}/>
                     </Routes>
                 </div>
             </div>
