@@ -100,8 +100,15 @@ export const reportFields = [
             { label: 'Imagen adicional', name: 'imagenAdicional', type: 'image'}, 
             { label: 'Codigo de Radio:', name: 'configuracionRadio', type: 'textarea', required: true }, 
             { label: 'Hora de Termino:', name: 'horaTermino', type: 'time', required: true },
-     
+    
         ],
     },
-   
+  
+];
+
+export const userFields = [
+    { name: "numeroTrabajador", label: "Número de Trabajador", type: "text" },
+    { name: "nombre", label: "Nombre", type: "text" },
+    { name: "password", label: "Contraseña", type: "password" },
+    { name: "confirmPassword", label: "Confirmar Contraseña", type: "password" },
 ];

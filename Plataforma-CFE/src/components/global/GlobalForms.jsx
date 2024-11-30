@@ -182,3 +182,126 @@ export const GeneraFormularioReporte = ({
         </>
     );
 };
+
+export const GeneraFormularioUsuarios = ({
+    data = [],
+    initValues,
+    title,
+    description,
+    titleBtn,
+    msgSuccess,
+    msgError,
+    sendData,
+}) => {
+    const [formData, setFormData] = useState(initValues);
+    const [snackbar, setSnackbar] = useState({ message: "", type: "success" });
+
+    const handleChange = (e, fieldName) => {
+        const { type, checked, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [fieldName]: type === "checkbox" ? checked : value,
+        }));
+    };
+
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            console.log("Enviando datos a:", sendData);
+            console.log("Datos del formulario:", formData);
+            setSnackbar({ message: msgSuccess, type: "success" });
+        } catch (error) {
+            console.error("Error al enviar los datos:", error);
+            setSnackbar({ message: msgError, type: "error" });
+        }
+    };
+
+    return (
+        <>
+            <form
+                onSubmit={handleFormSubmit}
+                className="max-w-3xl mx-auto space-y-8 p-8 bg-gradient-to-br from-white rounded-lg shadow-md"
+            >
+                {/* Encabezado */}
+                <div className="text-center">
+                    <h1 className="text-4xl font-extrabold text-emerald-600 tracking-tight">{title}</h1>
+                    <p className="text-gray-500 mt-3 text-lg">{description}</p>
+                </div>
+
+                {/* Campos del formulario */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {data.map((field, fieldIndex) => (
+                        <div key={fieldIndex} className="flex flex-col">
+                            {/* Renderizado dinámico de campos */}
+                            {field.type === "select" && (
+                                <Dropdown
+                                    label={field.label}
+                                    options={field.options}
+                                    onSelect={(value) =>
+                                        setFormData((prev) => ({
+                                            ...prev,
+                                            [field.name]: value,
+                                        }))
+                                    }
+                                />
+                            )}
+                            {(field.type === "text" ||
+                                field.type === "password" ||
+                                field.type === "number") && (
+                                <TextField
+                                    label={field.label}
+                                    name={field.name}
+                                    type={field.type}
+                                    placeholder={field.placeholder}
+                                    value={formData[field.name] || ""}
+                                    onChange={(e) => handleChange(e, field.name)}
+                                />
+                            )}
+                            {field.type === "textarea" && (
+                                <TextArea
+                                    label={field.label}
+                                    name={field.name}
+                                    placeholder={field.placeholder}
+                                    value={formData[field.name] || ""}
+                                    onChange={(e) => handleChange(e, field.name)}
+                                />
+                            )}
+                            {field.type === "checkbox" && (
+                                <Checkbox
+                                    label={field.label}
+                                    name={field.name}
+                                    checked={formData[field.name] || false}
+                                    onChange={(e) => handleChange(e, field.name)}
+                                />
+                            )}
+                        </div>
+                    ))}
+                </div>
+
+                {/* Botón de enviar */}
+                <div className="flex justify-end">
+                    <button
+                        type="submit"
+                        className="bg-emerald-600 text-white font-medium text-sm md:text-base px-6 py-3 rounded-full hover:bg-emerald-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-300"
+                    >
+                        {titleBtn}
+                    </button>
+                </div>
+            </form>
+
+            {/* Snackbar */}
+            {snackbar.message && (
+                <Snackbar
+                    message={snackbar.message}
+                    type={snackbar.type}
+                    duration={3000}
+                    onClose={() => setSnackbar({ message: "", type: "" })}
+                />
+            )}
+        </>
+    );
+};
+
+
+
+
