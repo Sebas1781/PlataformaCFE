@@ -6,6 +6,7 @@ import NewReport from "./modules/reports/NewReport";
 import AddUser from './modules/users/AddUser';
 import EditUser from './modules/users/EditUser';
 import ProfileDetails from './modules/profile/ProfileDetails';
+import ReportTables from './modules/reports/ReportTables';
 
 import { checkBackendConnection } from './system/Config';
 import ChangePassword from './modules/profile/ChangePassword';
@@ -24,6 +25,7 @@ function App() {
                         <Route path="/editar/usuario" element={<EditUser/>}/>
                         <Route path="/perfil" element={<ProfileDetails/>}/>
                         <Route path="/cambiar/contraseña" element={<ChangePassword/>}/>
+                        <Route path="/reportes" element={<ReportTables/>}/>
                     </Routes>
                 </div>
             </div>
@@ -31,4 +33,4 @@ function App() {
     );
 }
 
-export default App;
+export default App; 
