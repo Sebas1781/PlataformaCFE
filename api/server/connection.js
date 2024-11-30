@@ -9,10 +9,11 @@ const config = {
   server: SysConfig.ServerName,
   database: SysConfig.DbName,
   options: {
-    encrypt: true, // Use this if you're on Windows Azure
+    encrypt: true, 
     enableArithAbort: true,
-    connectTimeout: 30000, // Aumenta el tiempo de espera de la conexión a 30 segundos
-    requestTimeout: 30000 // Aumenta el tiempo de espera de la solicitud a 30 segundos
+    connectTimeout: 30000, 
+    requestTimeout: 30000, 
+    trustServerCertificate: true 
   }
 };
 

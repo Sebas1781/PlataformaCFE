@@ -7,7 +7,7 @@ switch (SysConfig.DbType) {
               user: SysConfig.DbUserName,
               password: SysConfig.DbUserPass,
               server: SysConfig.ServerName,
-              port: SysConfig.ServerPort,
+              port: SysConfig.ServerPort ,
               database: SysConfig.DbName,
               options: {
                   trustServerCertificate: true,
