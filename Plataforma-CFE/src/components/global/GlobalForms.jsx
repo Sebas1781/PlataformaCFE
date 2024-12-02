@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Snackbar from "../global/Snackbar"; // Ajustar ruta según tu estructura
 import { Dropdown, TextField, Checkbox, TextArea, Range, ImageInput } from "../Misc/MiscDesings";
+import MapWithInputs from "../Misc/MapWithInputs"; // Asegúrate de que la ruta sea correcta
 
 export const GeneraFormularioReporte = ({
     data = [],
@@ -25,13 +26,22 @@ export const GeneraFormularioReporte = ({
         }));
     };
 
-    const handleNextSection = () => {
+    const handleMapChange = (location) => {
+        setFormData((prev) => ({
+            ...prev,
+            ubicacionMapa: location,
+        }));
+    };
+
+    const handleNextSection = (e) => {
+        e.preventDefault();
         if (currentSection < data.length - 1) {
             setCurrentSection((prev) => prev + 1);
         }
     };
 
-    const handlePreviousSection = () => {
+    const handlePreviousSection = (e) => {
+        e.preventDefault();
         if (currentSection > 0) {
             setCurrentSection((prev) => prev - 1);
         }
@@ -42,8 +52,10 @@ export const GeneraFormularioReporte = ({
         try {
             console.log("Enviando datos a:", sendData);
             console.log("Datos del formulario:", formData);
+            setSnackbar({ message: msgSuccess, type: "success" });
         } catch (error) {
             console.error("Error al enviar los datos:", error);
+            setSnackbar({ message: msgError, type: "error" });
         }
     };
 
@@ -51,7 +63,7 @@ export const GeneraFormularioReporte = ({
         <>
             <form
                 onSubmit={handleFormSubmit}
-                className="max-w-5xl mx-auto space-y-8 p-8 bg-gradient-to-br from-white rounded-lg shadow-md"
+                className="max-w-5xl mx-auto space-y-8 p-8 bg-gradient-to-br from-white rounded-lg flex flex-col"
             >
                 {/* Encabezado */}
                 <div className="text-center">
@@ -65,22 +77,21 @@ export const GeneraFormularioReporte = ({
                         <h3 className="text-2xl font-semibold text-emerald-600">
                             {data[currentSection].sectionName}
                         </h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div className="grid grid-cols-1 gap-6">
                             {data[currentSection].fields.map((field, fieldIndex) => (
                                 <div key={fieldIndex} className="flex flex-col">
                                     {/* Renderizado dinámico de campos */}
                                     {field.type === "select" && (
                                         <Dropdown
-                                        label={field.label} // Renderiza el label sobre el Dropdown
-                                        options={field.options}
-                                        onSelect={(value) =>
-                                            setFormData((prev) => ({
-                                                ...prev,
-                                                [field.name]: value,
-                                            }))
-                                        }
-                                    />
-                                    
+                                            label={field.label}
+                                            options={field.options}
+                                            onSelect={(value) =>
+                                                setFormData((prev) => ({
+                                                    ...prev,
+                                                    [field.name]: value,
+                                                }))
+                                            }
+                                        />
                                     )}
                                     {(field.type === "text" ||
                                         field.type === "number" ||
@@ -134,13 +145,19 @@ export const GeneraFormularioReporte = ({
                                             }
                                         />
                                     )}
+                                    {field.type === "map" && (
+                                        <MapWithInputs
+                                            value={formData[field.name] || {}}
+                                            onChange={(location) => handleMapChange(location)}
+                                        />
+                                    )}
                                 </div>
                             ))}
                         </div>
                     </div>
                 )}
 
-                {/* Controles de navegación */}
+            {/* Controles de navegación */}
                 <div className="flex justify-between items-center">
                     {currentSection > 0 && (
                         <button
@@ -301,7 +318,3 @@ export const GeneraFormularioUsuarios = ({
         </>
     );
 };
-
-
-
-
