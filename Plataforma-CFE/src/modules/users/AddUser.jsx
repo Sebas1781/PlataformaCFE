@@ -1,5 +1,5 @@
 import { GeneraFormularioUsuarios } from "../../components/global/GlobalForms";
-import { userFields } from "../../data/formConfig";
+import { userFields } from "../../data/formConfig.js";
 
 const AddUser = () => {
     const initValues = {

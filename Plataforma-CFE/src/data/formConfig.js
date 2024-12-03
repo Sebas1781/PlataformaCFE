@@ -30,7 +30,7 @@ export const reportFields = [
             { label: 'Cable pigtail:', name: 'cablePigtail', type: 'select', options: ['Opcion 1', 'Opcion 2', 'Opcion 3', 'Opcion 4', 'Opcion 5'], required: true },
             { label: 'Supresor:', name: 'supresor', type: 'select', options: ['Opcion 1', 'Opcion 2', 'Opcion 3', 'Opcion 4', 'Opcion 5'], required: true },
             { label: 'Cable de L.T. :', name: 'cableLT', type: 'select', options: ['Opcion 1', 'Opcion 2', 'Opcion 3', 'Opcion 4', 'Opcion 5'], required: true },
-            { label: 'Altura antena (m):', name: 'alturaAntena', type: 'number', placeholder: 'Asltura antena', required: true },
+            { label: 'Altura antena (m):', name: 'alturaAntena', type: 'number', placeholder: 'Altura antena', required: true },
             { label: 'Repetidor de enlace:', name: 'repetidorEnlace', type: 'select', options: ['Opcion 1', 'Opcion 2', 'Opcion 3', 'Opcion 4', 'Opcion 5'], required: true },
             { label: 'Canal UCM:', name: 'canalUCM', type: 'select', options: ['Opcion 1', 'Opcion 2', 'Opcion 3', 'Opcion 4', 'Opcion 5'], required: true },
         ],
@@ -100,22 +100,22 @@ export const reportFields = [
             { label: 'Imagen adicional', name: 'imagenAdicional', type: 'image'}, 
             { label: 'Codigo de Radio:', name: 'configuracionRadio', type: 'textarea', required: true }, 
             { label: 'Hora de Termino:', name: 'horaTermino', type: 'time', required: true },
-    
+     
         ],
     },
-  
+   
 ];
 
+//TODO aki ponen sus formularios
+
 export const userFields = [
-    { name: "numeroTrabajador", label: "Número de Trabajador", type: "text" },
-    { name: "nombre", label: "Nombre", type: "text" },
-    { name: "password", label: "Contraseña", type: "password" },
-    { name: "confirmPassword", label: "Confirmar Contraseña", type: "password" },
+    { label: 'Número de Trabajador', name: 'numeroTrabajador', type: 'text', required: true },
+    { label: 'Nombre', name: 'nombre', type: 'text', required: true },
+    { label: 'Contraseña', name: 'password', type: 'password', required: true },
+    { label: 'Confirmar Contraseña', name: 'confirmPassword', type: 'password', required: true },
 ];
 
 export const passwordFields = [
-    { name: "contraseñaActual", label: "Contraseña Actual", type: "password" },
-    { name: "nuevaPassword", label: "Nueva Contraseña", type: "password" },
-    { name: "confirmPassword", label: "Confirmar Contraseña", type: "password" },
-    
+    { label: 'Contraseña', name: 'password', type: 'password', required: true },
+    { label: 'Confirmar Contraseña', name: 'confirmPassword', type: 'password', required: true },
 ];

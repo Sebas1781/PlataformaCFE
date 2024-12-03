@@ -15,9 +15,9 @@ function App() {
     checkBackendConnection();
     return (
         <LoadScript googleMapsApiKey="AIzaSyC-g_SwMSxKdoeYDhbXPdgC6VFBSnf3yJo">
-            <div className="relative flex h-screen">
+            <div className="relative flex h-screen overflow-hidden">
                 <Sidebar />
-                <div className="flex-grow">
+                <div className="flex-grow overflow-auto">
                     <Routes>
                         <Route path="/" element={<Dashboard />} />
                         <Route path="/nuevo/reporte" element={<NewReport />} />

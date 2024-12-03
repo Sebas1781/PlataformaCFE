@@ -1,4 +1,18 @@
 import { useState } from "react";
+import { GoogleMap, Marker } from "@react-google-maps/api";
+
+//Componente mapa:
+
+const mapContainerStyle = {
+    width: '100%',
+    height: '400px',
+  };
+  
+  const center = {
+    lat: 20.115417,
+    lng: -98.758944,
+  };
+
 
 // Dropdown Component
 export const Dropdown = ({ label, options, placeholder = "Seleccione una opción", onSelect }) => {
@@ -20,6 +34,7 @@ export const Dropdown = ({ label, options, placeholder = "Seleccione una opción
             )}
             <div className="relative">
                 <button
+                    type="button"
                     onClick={() => setIsOpen(!isOpen)}
                     className="w-full h-12 bg-white border border-gray-300 text-gray-700 px-4 rounded-lg shadow-sm flex justify-between items-center 
                                hover:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600 
@@ -217,11 +232,6 @@ export const Range = ({ label, name, min = 0, max = 100, value, onChange }) => {
     );
 };
 
-
-
-
-
-
 // Image Input Component
 export const ImageInput = ({ label, name, onChange }) => (
     <div className="flex flex-col space-y-2">
@@ -239,4 +249,17 @@ export const ImageInput = ({ label, name, onChange }) => (
     </div>
 );
 
+//Map Component
+export const GoogleMaps = ({ markers = [], onMapClick }) => (
+    <GoogleMap
+        mapContainerStyle={mapContainerStyle}
+        center={center}
+        zoom={10}
+        onClick={onMapClick}
+    >
+        {markers.map((marker, index) => (
+            <Marker key={index} position={marker} />
+        ))}
+    </GoogleMap>
+);
 
