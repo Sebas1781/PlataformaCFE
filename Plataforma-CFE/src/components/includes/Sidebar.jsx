@@ -8,7 +8,11 @@ const Sidebar = () => {
 
     useEffect(() => {
         const handleClickOutside = (event) => {
-            if (isSidebarOpen && !document.getElementById("sidebar").contains(event.target)) {
+            if (
+                isSidebarOpen &&
+                !document.getElementById("sidebar").contains(event.target) &&
+                !event.target.closest("#menu-button")
+            ) {
                 setIsSidebarOpen(false);
             }
         };
@@ -28,15 +32,16 @@ const Sidebar = () => {
         <>
             {/* Botón para abrir/cerrar el Sidebar en móviles */}
             <button
+                id="menu-button"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                 aria-controls="sidebar"
                 type="button"
                 className={`fixed top-4 left-4 z-50 p-2 bg-emerald-600 rounded-md text-white sm:hidden transition-transform duration-500 ease-in-out ${
                     isSidebarOpen ? "translate-x-72" : "translate-x-0"
                 }`}
-                style={{ zIndex: 101 }} 
+                style={{ zIndex: 101 }}
             >
-                <span className="sr-only">{isSidebarOpen ? "Close sidebar" : "Open sidebar"}</span>
+                <span className="sr-only">{isSidebarOpen ? "Cerrar Sidebar" : "Abrir Sidebar"}</span>
                 <svg
                     className="w-6 h-6"
                     aria-hidden="true"

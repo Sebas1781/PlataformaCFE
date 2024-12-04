@@ -11,9 +11,9 @@ const ProfileDetails = () => {
     };
 
     return (
-        <div className="flex justify-center items-center h-screen bg-gray-100">
+        <div className="flex justify-center items-center h-screen bg-white">
             {/* Tarjeta del perfil */}
-            <div className="bg-white shadow-lg rounded-lg max-w-md w-full p-6">
+            <div className="bg-white rounded-lg max-w-md w-full p-6 md:shadow-lg">
                 {/* Encabezado del perfil */}
                 <div className="flex items-center justify-center">
                     <div className="w-24 h-24 rounded-full bg-emerald-600 flex items-center justify-center text-white text-4xl font-bold">
