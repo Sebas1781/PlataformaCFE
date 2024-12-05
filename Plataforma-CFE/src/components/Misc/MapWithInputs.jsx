@@ -1,17 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 import { GoogleMaps } from "./MiscDesings";
 
-const MapWithInputs = () => {
-    const [markers, setMarkers] = useState([]);
-    const [latitude, setLatitude] = useState("");
-    const [longitude, setLongitude] = useState("");
-
+const MapWithInputs = ({ value = { lat: "", lng: "" }, onChange }) => {
     const handleMapClick = (event) => {
         const lat = event.latLng.lat();
         const lng = event.latLng.lng();
-        setMarkers([{ lat, lng }]);
-        setLatitude(lat);
-        setLongitude(lng);
+        const location = { lat, lng };
+        onChange(location); // Actualizar coordenadas en el estado del componente principal
     };
 
     const handleGetLocation = () => {
@@ -19,9 +14,8 @@ const MapWithInputs = () => {
             navigator.geolocation.getCurrentPosition((position) => {
                 const lat = position.coords.latitude;
                 const lng = position.coords.longitude;
-                setMarkers([{ lat, lng }]);
-                setLatitude(lat);
-                setLongitude(lng);
+                const location = { lat, lng };
+                onChange(location); // Actualizar coordenadas en el estado del componente principal
             });
         } else {
             alert("Geolocation is not supported by this browser.");
@@ -30,12 +24,12 @@ const MapWithInputs = () => {
 
     return (
         <div>
-            <GoogleMaps markers={markers} onMapClick={handleMapClick} />
+            <GoogleMaps markers={[value]} onMapClick={handleMapClick} />
             <div className="flex flex-col space-y-4 mt-4">
                 <label className="text-sm font-medium text-gray-800">Latitud:</label>
                 <input
                     type="text"
-                    value={latitude}
+                    value={value.lat || ""}
                     readOnly
                     className="h-12 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 placeholder-gray-400 
                                focus:ring-2 focus:ring-emerald-600 focus:outline-none focus:border-emerald-600 
@@ -44,7 +38,7 @@ const MapWithInputs = () => {
                 <label className="text-sm font-medium text-gray-800">Longitud:</label>
                 <input
                     type="text"
-                    value={longitude}
+                    value={value.lng || ""}
                     readOnly
                     className="h-12 px-4 border border-gray-300 rounded-lg shadow-sm bg-white text-gray-900 placeholder-gray-400 
                                focus:ring-2 focus:ring-emerald-600 focus:outline-none focus:border-emerald-600 
@@ -53,7 +47,7 @@ const MapWithInputs = () => {
                 <button
                     type="button"
                     onClick={handleGetLocation}
-                    className="h-12 px-4 border  border-gray-300 rounded-lg shadow-sm bg-emerald-600 text-white font-medium 
+                    className="h-12 px-4 border border-gray-300 rounded-lg shadow-sm bg-emerald-600 text-white font-medium 
                                focus:ring-2 focus:ring-emerald-600 focus:outline-none focus:border-emerald-600 
                                hover:shadow-md hover:border-emerald-600 transition-all duration-300 mt-8 mb-10"
                 >
