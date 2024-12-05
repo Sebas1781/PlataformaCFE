@@ -116,6 +116,8 @@ export const userFields = [
 ];
 
 export const passwordFields = [
-    { label: 'Contraseña', name: 'password', type: 'password', required: true },
-    { label: 'Confirmar Contraseña', name: 'confirmPassword', type: 'password', required: true },
+    { label: 'Contraseña', name: 'password', type: 'password', required: true,validations:{pattern:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+    errorMessage:"La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un caracter especial" },},
+    { label: 'Confirmar Contraseña', name: 'confirmPassword', type: 'password', required: true,validations:{matchField:"password",errorMessage:"Las contraseñas no coinciden."} },
+    { label: 'Contraseña Antigua', name: 'confirmPassword', type: 'password', required: true,validations:{matchField:"password",errorMessage:"Las contraseñas no coinciden."} },
 ];

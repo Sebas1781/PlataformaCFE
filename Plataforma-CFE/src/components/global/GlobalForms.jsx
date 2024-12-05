@@ -17,38 +17,37 @@ export const GeneraFormularioReporte = ({
     const [formData, setFormData] = useState(initValues);
     const [currentSection, setCurrentSection] = useState(0);
     const [snackbar, setSnackbar] = useState({ message: "", type: "success" });
+    const [errors, setErrors] = useState({}); // Inicializar el estado de errores
 
     const handleChange = (e, fieldName) => {
         const { type, checked, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [fieldName]: type === "checkbox" ? checked : value,
-        }));
+        const newValue = type === "checkbox" ? checked : value;
+    
+        const field = data[currentSection].fields.find((f) => f.name === fieldName);
+        const error = validateField(field, newValue, formData);
+    
+        setFormData((prev) => ({ ...prev, [fieldName]: newValue }));
+        setErrors((prev) => ({ ...prev, [fieldName]: error }));
     };
-
-    const handleMapChange = (location) => {
-        setFormData((prev) => ({
-            ...prev,
-            ubicacionMapa: location,
-        }));
-    };
-
-    const handleNextSection = (e) => {
-        e.preventDefault();
-        if (currentSection < data.length - 1) {
-            setCurrentSection((prev) => prev + 1);
-        }
-    };
-
-    const handlePreviousSection = (e) => {
-        e.preventDefault();
-        if (currentSection > 0) {
-            setCurrentSection((prev) => prev - 1);
-        }
-    };
-
+    
     const handleFormSubmit = async (e) => {
         e.preventDefault();
+    
+        // Validar todos los campos de la sección actual
+        const newErrors = {};
+        data[currentSection].fields.forEach((field) => {
+            const error = validateField(field, formData[field.name], formData);
+            if (error) {
+                newErrors[field.name] = error;
+            }
+        });
+    
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            setSnackbar({ message: msgError, type: "error" });
+            return;
+        }
+    
         try {
             console.log("Enviando datos a:", sendData);
             console.log("Datos del formulario:", formData);
@@ -58,6 +57,7 @@ export const GeneraFormularioReporte = ({
             setSnackbar({ message: msgError, type: "error" });
         }
     };
+    
 
     return (
         <>
@@ -211,18 +211,38 @@ export const GeneraFormularioUsuarios = ({
     sendData,
 }) => {
     const [formData, setFormData] = useState(initValues);
+    const [errors, setErrors] = useState({}); // Inicializar el estado de errores
     const [snackbar, setSnackbar] = useState({ message: "", type: "success" });
 
     const handleChange = (e, fieldName) => {
         const { type, checked, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [fieldName]: type === "checkbox" ? checked : value,
-        }));
+        const newValue = type === "checkbox" ? checked : value;
+    
+        const field = data.find((f) => f.name === fieldName);
+        const error = validateField(field, newValue, formData);
+    
+        setFormData((prev) => ({ ...prev, [fieldName]: newValue }));
+        setErrors((prev) => ({ ...prev, [fieldName]: error }));
     };
-
+    
     const handleFormSubmit = async (e) => {
         e.preventDefault();
+    
+        // Validar todos los campos
+        const newErrors = {};
+        data.forEach((field) => {
+            const error = validateField(field, formData[field.name], formData);
+            if (error) {
+                newErrors[field.name] = error;
+            }
+        });
+    
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
+            setSnackbar({ message: msgError, type: "error" });
+            return;
+        }
+    
         try {
             console.log("Enviando datos a:", sendData);
             console.log("Datos del formulario:", formData);
@@ -232,7 +252,29 @@ export const GeneraFormularioUsuarios = ({
             setSnackbar({ message: msgError, type: "error" });
         }
     };
+    
+// Función de validación
+const validateField = (field, value, formData) => {
+    let error = "";
 
+    // Validación requerida
+    if (field.required && !value) {
+        error = "Este campo es obligatorio.";
+    }
+
+    // Validación de patrón
+    if (field.validations?.pattern && !field.validations.pattern.test(value)) {
+        error = field.validations.errorMessage || "Formato no válido.";
+    }
+
+    // Validación de coincidencia de campos
+    if (field.validations?.matchField && value !== formData[field.validations.matchField]) {
+        error = field.validations.errorMessage || "Los campos no coinciden.";
+    }
+
+    return error;
+        
+};
     return (
         <>
             <form
