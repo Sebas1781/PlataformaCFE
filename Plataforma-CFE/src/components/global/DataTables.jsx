@@ -5,7 +5,7 @@ export const GenerarTabla = ({ header = [], title = "", description = "", titleB
   const navigate = useNavigate(); // Hook para redirigir
 
   return (
-    <div className="p-6 bg-gray-50">
+    <div className="p-6 bg-white">
       <h1 className="text-2xl font-semibold text-emerald-600">{title}</h1>
       <p className="text-gray-700 mb-4">{description}</p>
       <button
