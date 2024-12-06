@@ -12,7 +12,7 @@ export const reportFields = [
             { label: 'Restaurador:', name: 'restaurador', type: 'number', placeholder: 'Restaurador', required: true },
             { label: 'Circuito:', name: 'circuito', type: 'select', options: ['Opcion 1', 'Opcion 2', 'Opcion 3', 'Opcion 4', ''], required: true },
             { label: 'Area:', name: 'area', type: 'select', options: ['Pachuca', 'Actopan', 'Cubitos', 'Tizayuca'], required: true },
-            { label: 'Ubicación en el mapa', name: 'ubicacionMapa', type: 'map', required: true }, 
+            { label: 'Ubicación en el mapa', name: 'ubicacionMapa', type: 'map', required: false }, 
             { label: 'Dirección', name: 'direccion', type: 'text', required: true },
         ],
     },
@@ -116,6 +116,8 @@ export const userFields = [
 ];
 
 export const passwordFields = [
-    { label: 'Contraseña', name: 'password', type: 'password', required: true },
-    { label: 'Confirmar Contraseña', name: 'confirmPassword', type: 'password', required: true },
+    { label: 'Contraseña', name: 'password', type: 'password', required: true,validations:{pattern:/^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+    errorMessage:"La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un caracter especial" },},
+    { label: 'Confirmar Contraseña', name: 'confirmPassword', type: 'password', required: true,validations:{matchField:"password",errorMessage:"Las contraseñas no coinciden."} },
+    { label: 'Contraseña Antigua', name: 'confirmPassword', type: 'password', required: true,validations:{matchField:"password",errorMessage:"Las contraseñas no coinciden."} },
 ];

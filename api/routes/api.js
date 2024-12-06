@@ -1,4 +1,5 @@
 const express = require('express');
+const session = require('express-session');
 const api = express.Router();
 const mssql = require('mssql');
 
@@ -180,5 +181,103 @@ api.post('/agregarReporte', async (req, res) => {
   }
 });
 
+
+
+
+/*-----------------------------------------------------
+    End Points by Carlos
+-------------------------------------------------------*/
+
+api.post('/AgregarUsuario', async(req, res) =>{
+  const procedureName= 'AddUser';
+  const {numeroTrabajador, nombre, password, tipoUsuario} = req.body;
+
+  try {
+    if (!numeroTrabajador || !nombre || !password || !tipoUsuario) {
+      return res.status(400).json({message: 'Todos los campos son obligatorios'});
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const request = SysConn.request();
+
+    request.input('numeroTrabajador', mssql.VarChar, numeroTrabajador);
+    request.input('nombre', mssql.VarChar, nombre);
+    request.input('password', mssql.VarChar, hashedPassword); 
+    request.input('tipoUsuario', mssql.Int, tipoUsuario);
+    
+    await request.execute(procedureName);
+
+    res.json({message: 'Usuario agregado correctamente'});
+  } catch (error) {
+    console.error('Error al ejecutar el Store Procedure:', error);
+    res.status(500).json({ error: 'Error al ejecutar el Store Procedure' });
+  }
+});
+
+
+api.post('/ObtenerUsuario', async(req, res) =>{
+  const {idTrabajador} = req.body;
+
+  try {
+    const request = SysConn.request();
+    request.input('idTrabajador', mssql.Int, idTrabajador);
+
+    const result = await request.execute('GetUserById');
+
+    if(result.recordset.length === 0){
+      return res.status(404).json({message: 'Usuario no encontrado'});
+    }
+
+    res.json(result.recordset[0]);
+    
+  } catch (error) {
+    
+    console.error('Error al obtener datos del usuario: ',error);
+    res.status(500).json({error: 'Error al obtener los datos del usuario'});
+  }
+});  
+  
+api.post('/ActualizarUsuario', async (req, res) => {
+  const procedureName= 'UserUpdate';
+  const { idTrabajador, numeroTrabajador, nombre, password, tipoUsuario } = req.body;
+  
+  try {
+    const request = SysConn.request();
+  
+    request.input('idTrabajador', mssql.Int, idTrabajador);
+    request.input('numeroTrabajador', mssql.VarChar, numeroTrabajador);
+    request.input('nombre', mssql.VarChar, nombre);
+    request.input('password', mssql.VarChar, password);
+    request.input('tipoUsuario', mssql.Int, tipoUsuario);
+  
+    await request.execute(procedureName);
+    res.json({message: 'Usuario actualizado exitosamente'});
+  } catch (error) {
+    console.error('Error al ejecutar el Store Procedure:', error);
+    res.status(500).json({ error: 'Error al ejecutar el Store Procedure' });
+  }
+});
+  
+
+api.delete('/EliminarUsuario/:id', async (req, res)=> {
+  const procedureName = "DeleteUser";
+  const {id} = req.params;
+
+  try {
+    
+    if (!id) {
+       return res.status(400).json({message: 'El Id del usuario es obligatorio'})
+    }
+
+    const request = SysConn.request();
+    request.input('idTrabajador', mssql.Int.id);
+    const result = await request.execute(procedureName);
+    res.json({message: 'Usuario eliminado exitosamente'});
+
+  } catch (error) {
+    console.error('Error al ejecutar el Store Procedure:', error);
+    res.status(500).json({ error: 'Error al ejecutar el Store Procedure' });
+  }
+});
 
 module.exports = api;
