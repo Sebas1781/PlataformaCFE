@@ -71,3 +71,14 @@ BEGIN
         PRINT 'Usuario actualizado exitosamente';
     END
 END;
+
+-- Buscar Usuario por numeroTrabajador para el LogIn
+
+CREATE PROCEDURE GetUserByNumeroTrabajador
+    @numeroTrabajador VARCHAR(100)
+AS
+BEGIN
+    SELECT idTrabajador, numeroTrabajador, nombre, tipoUsuario, password
+    FROM Usuarios
+    WHERE numeroTrabajador = @numeroTrabajador
+END;

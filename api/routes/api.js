@@ -2,7 +2,9 @@ const express = require('express');
 const session = require('express-session');
 const api = express.Router();
 const mssql = require('mssql');
+const bcrypt = require('bcryptjs');
 
+const app = express();
 
 const SysConn = require("../server/connection");
 
@@ -279,5 +281,107 @@ api.delete('/EliminarUsuario/:id', async (req, res)=> {
     res.status(500).json({ error: 'Error al ejecutar el Store Procedure' });
   }
 });
+
+/*-----------------------------------------------------
+    Propuesta de Log in
+-------------------------------------------------------*/
+
+app.use(express.json()); // Middleware para parsear JSON
+
+// Configuración de sesión
+app.use(session({
+  secret: 'mi_secreto_seguro', // Cambiar por un secreto único
+  resave: false,              // No guardar la sesión si no hay cambios
+  saveUninitialized: false,   // No guardar sesiones vacías
+  cookie: { maxAge: 8 * 60 * 60 * 1000 } // Sesión válida por 8 horas
+}));
+
+
+app.post('/login', async (req, res) => {
+  const { numeroTrabajador, password } = req.body;
+
+  try {
+    if (!numeroTrabajador || !password) {
+      return res.status(400).json({ message: 'Número de trabajador y contraseña son obligatorios' });
+    }
+
+    // Crear una solicitud a la base de datos
+    const request = SysConn.request();
+    request.input('numeroTrabajador', mssql.VarChar, numeroTrabajador);
+
+    // Ejecutar el procedimiento almacenado
+    const result = await request.execute('GetUserByNumeroTrabajador');
+    const usuario = result.recordset[0];
+
+    if (!usuario) {
+      return res.status(401).json({ message: 'Credenciales incorrectas' });
+    }
+
+    // Verificar la contraseña
+    const passwordValida = await bcrypt.compare(password, usuario.password);
+    if (!passwordValida) {
+      return res.status(401).json({ message: 'Credenciales incorrectas' });
+    }
+
+    // Guardar el ID del usuario en la sesión
+    req.session.idTrabajador = usuario.idTrabajador;
+
+    res.json({ message: 'Inicio de sesión exitoso', user: { nombre: usuario.nombre, tipoUsuario: usuario.tipoUsuario } });
+  } catch (error) {
+    console.error('Error en el inicio de sesión:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
+
+/*-----------------------------------------------------
+    Cambiar contraseña
+-------------------------------------------------------*/
+
+app.put('/CambiarPassword', async (req, res) => {
+  const { passwordActual, nuevaPassword } = req.body;
+
+  try {
+    if (!passwordActual || !nuevaPassword) {
+      return res.status(400).json({ message: 'Contraseña actual y nueva contraseña son obligatorias' });
+    }
+
+    // Verificar que el usuario esté autenticado
+    if (!req.session.idTrabajador) {
+      return res.status(401).json({ message: 'No autorizado' });
+    }
+
+    const idTrabajador = req.session.idTrabajador;
+
+    // Obtener la contraseña actual de la base de datos
+    const request = SysConn.request();
+    request.input('IdTrabajador', mssql.Int, idTrabajador);
+
+    const result = await request.query('SELECT password FROM Usuarios WHERE idTrabajador = @IdTrabajador');
+    const usuario = result.recordset[0];
+
+    if (!usuario) {
+      return res.status(404).json({ message: 'Usuario no encontrado' });
+    }
+
+    // Verificar que la contraseña actual coincida
+    const passwordValida = await bcrypt.compare(passwordActual, usuario.password);
+    if (!passwordValida) {
+      return res.status(401).json({ message: 'La contraseña actual no es correcta' });
+    }
+
+    // Encriptar la nueva contraseña y actualizarla en la base de datos
+    const hashedPassword = await bcrypt.hash(nuevaPassword, 10);
+    request.input('NuevaPassword', mssql.VarChar, hashedPassword);
+
+    await request.execute('UpdateUserPassword'); // Procedimiento almacenado para actualizar la contraseña
+
+    res.json({ message: 'Contraseña cambiada correctamente' });
+  } catch (error) {
+    console.error('Error al cambiar la contraseña:', error);
+    res.status(500).json({ error: 'Error en el servidor' });
+  }
+});
+
 
 module.exports = api;
