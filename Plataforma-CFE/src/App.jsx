@@ -7,7 +7,6 @@ import AddUser from './modules/users/AddUser';
 import EditUser from './modules/users/EditUser';
 import ProfileDetails from './modules/profile/ProfileDetails';
 import ReportTables from './modules/reports/ReportTables';
-import { checkBackendConnection } from './system/Config';
 import ChangePassword from './modules/profile/ChangePassword';
 import { checkBackendConnection } from './system/Config';
 
