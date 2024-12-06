@@ -7,12 +7,7 @@ import AddUser from './modules/users/AddUser';
 import EditUser from './modules/users/EditUser';
 import ProfileDetails from './modules/profile/ProfileDetails';
 import ReportTables from './modules/reports/ReportTables';
-<<<<<<< HEAD
-
-
 import { checkBackendConnection } from './system/Config';
-=======
->>>>>>> 6949569bac9c70708927c214358fdb7b019e1136
 import ChangePassword from './modules/profile/ChangePassword';
 import { checkBackendConnection } from './system/Config';
 
