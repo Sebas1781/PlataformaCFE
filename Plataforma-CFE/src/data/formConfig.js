@@ -12,7 +12,7 @@ export const reportFields = [
             { label: 'Restaurador:', name: 'restaurador', type: 'number', placeholder: 'Restaurador', required: true },
             { label: 'Circuito:', name: 'circuito', type: 'select', options: ['Opcion 1', 'Opcion 2', 'Opcion 3', 'Opcion 4', ''], required: true },
             { label: 'Area:', name: 'area', type: 'select', options: ['Pachuca', 'Actopan', 'Cubitos', 'Tizayuca'], required: true },
-            { label: 'Ubicación en el mapa', name: 'ubicacionMapa', type: 'map', required: true }, 
+            { label: 'Ubicación en el mapa', name: 'ubicacionMapa', type: 'map', required: false }, 
             { label: 'Dirección', name: 'direccion', type: 'text', required: true },
         ],
     },
