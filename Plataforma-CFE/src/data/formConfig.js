@@ -121,3 +121,9 @@ export const passwordFields = [
     { label: 'Confirmar Contraseña', name: 'confirmPassword', type: 'password', required: true,validations:{matchField:"password",errorMessage:"Las contraseñas no coinciden."} },
     { label: 'Contraseña Antigua', name: 'confirmPassword', type: 'password', required: true,validations:{matchField:"password",errorMessage:"Las contraseñas no coinciden."} },
 ];
+
+export const loginFields = [
+    { label: "Número de Trabajador", name: "numeroTrabajador", type: "text", placeholder: "Ingrese su número de trabajador", required: true },
+    { label: "Contraseña", name: "password", type: "password", placeholder: "Ingrese su contraseña", required: true },
+    { label: "Mantener la sesión iniciada", name: "rememberMe", type: "checkbox" }, 
+];

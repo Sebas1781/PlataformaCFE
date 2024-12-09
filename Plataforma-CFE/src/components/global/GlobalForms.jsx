@@ -296,9 +296,6 @@ export const GeneraFormularioReporte = ({
     );
 };
 
-
-
-
 export const GeneraFormularioUsuarios = ({
     data = [],
     initValues,
@@ -421,6 +418,91 @@ export const GeneraFormularioUsuarios = ({
                     type={snackbar.type}
                     duration={3000}
                     onClose={() => setSnackbar({ message: "", type: "" })}
+                />
+            )}
+        </>
+    );
+};
+
+export const GeneraFormularioLogin = ({
+    data = [],          // Configuración de los campos
+    initValues = {},    // Valores iniciales
+    title,              // Título del formulario
+    description,        // Descripción del formulario
+    titleBtn,           // Texto del botón
+    msgSuccess,         // Mensaje de éxito
+    msgError,           // Mensaje de error
+    sendData,           // Endpoint del backend
+    onSuccess,          // Función para ejecutar tras éxito
+}) => {
+    const [formData, setFormData] = useState(initValues);
+    const [snackbar, setSnackbar] = useState(null);
+
+    const handleChange = (e, fieldName) => {
+        const { type, checked, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [fieldName]: type === "checkbox" ? checked : value,
+        }));
+    };
+
+    const handleFormSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            // Simula una solicitud al servidor
+            const response = { ok: true }; // Simula una respuesta exitosa
+            if (response.ok) {
+                setSnackbar({ message: msgSuccess, type: "success" });
+                if (onSuccess) onSuccess(formData); // Pasa el formData completo a onSuccess
+            } else {
+                throw new Error(msgError);
+            }
+        } catch (error) {
+            setSnackbar({ message: error.message, type: "error" });
+        }
+    };
+
+    return (
+        <>
+            <form onSubmit={handleFormSubmit} className="p-8 bg-white shadow-md rounded-lg max-w-md mx-auto space-y-6">
+                <div className="text-center">
+                    <h1 className="text-2xl font-bold">{title}</h1>
+                    <p className="text-gray-600">{description}</p>
+                </div>
+
+                {data.map((field) => (
+                    <div key={field.name} className="mb-4">
+                        {field.type === "checkbox" ? (
+                            <Checkbox
+                                label={field.label}
+                                name={field.name}
+                                checked={formData[field.name] || false}
+                                onChange={(e) => handleChange(e, field.name)}
+                            />
+                        ) : (
+                            <TextField
+                                label={field.label}
+                                name={field.name}
+                                type={field.type}
+                                placeholder={field.placeholder}
+                                value={formData[field.name] || ""}
+                                onChange={(e) => handleChange(e, field.name)}
+                            />
+                        )}
+                    </div>
+                ))}
+
+                <button type="submit" className="w-full bg-emerald-600 text-white py-2 rounded">
+                    {titleBtn}
+                </button>
+            </form>
+
+            {snackbar && (
+                <Snackbar
+                    message={snackbar.message}
+                    type={snackbar.type}
+                    onClose={() => setSnackbar(null)}
                 />
             )}
         </>

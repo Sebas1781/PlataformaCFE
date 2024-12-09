@@ -1,5 +1,6 @@
 import { LoadScript } from '@react-google-maps/api';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
+import { useState } from 'react';
 import Dashboard from "./components/includes/Dashboard";
 import Sidebar from "./components/includes/Sidebar";
 import NewReport from "./modules/reports/NewReport";
@@ -8,40 +9,39 @@ import EditUser from './modules/users/EditUser';
 import ProfileDetails from './modules/profile/ProfileDetails';
 import ReportTables from './modules/reports/ReportTables';
 import ChangePassword from './modules/profile/ChangePassword';
+import Login from './components/includes/Login';
 import { checkBackendConnection } from './system/Config';
 
 function App() {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+
     checkBackendConnection();
+
+    const PrivateRoute = ({ children }) => {
+        return isAuthenticated ? children : <Navigate to="/login" />;
+    };
+
+    const PublicRoute = ({ children }) => {
+        return !isAuthenticated ? children : <Navigate to="/" />;
+    };
 
     return (
         <LoadScript googleMapsApiKey="AIzaSyC-g_SwMSxKdoeYDhbXPdgC6VFBSnf3yJo">
             <div className="relative flex h-screen overflow-hidden">
-                {/* Sidebar general */}
-                <Sidebar />
-                <div className="flex-grow overflow-auto bg-transparent pt-10 relative">
+                {isAuthenticated && <Sidebar />}
+                <div className={`flex-grow overflow-auto bg-transparent pt-10 relative ${isAuthenticated ? "" : "h-screen"}`}>
                     <Routes>
-                        {/* Modificación SOLO para el Dashboard */}
-                        <Route
-                            path="/"
-                            element={
-                                <div className="flex h-full">
-                                    <div className="flex-grow flex justify-center bg-transparent">
-                                        <div className="w-full max-w-5xl p-6 pt-1 sm:pt-16 lg:pt-1">
-                                            {/* pt-32: padding superior en móvil, pt-16 en tablet, pt-6 en escritorio */}
-                                            <Dashboard />
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        />
+                        {/* Ruta de login (solo si no está autenticado) */}
+                        <Route path="/login" element={<PublicRoute><Login setIsAuthenticated={setIsAuthenticated} /></PublicRoute>} />
 
-                        {/* Los demás routes permanecen SIN cambios */}
-                        <Route path="/nuevo/reporte" element={<NewReport />} />
-                        <Route path="/nuevo/usuario" element={<AddUser />} />
-                        <Route path="/editar/usuario" element={<EditUser />} />
-                        <Route path="/perfil" element={<ProfileDetails />} />
-                        <Route path="/cambiar/contraseña" element={<ChangePassword />} />
-                        <Route path="/reportes" element={<ReportTables />} />
+                        {/* Rutas privadas */}
+                        <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
+                        <Route path="/nuevo/reporte" element={<PrivateRoute><NewReport /></PrivateRoute>} />
+                        <Route path="/nuevo/usuario" element={<PrivateRoute><AddUser /></PrivateRoute>} />
+                        <Route path="/editar/usuario" element={<PrivateRoute><EditUser /></PrivateRoute>} />
+                        <Route path="/perfil" element={<PrivateRoute><ProfileDetails /></PrivateRoute>} />
+                        <Route path="/cambiar/contraseña" element={<PrivateRoute><ChangePassword /></PrivateRoute>} />
+                        <Route path="/reportes" element={<PrivateRoute><ReportTables /></PrivateRoute>} />
                     </Routes>
                 </div>
             </div>
