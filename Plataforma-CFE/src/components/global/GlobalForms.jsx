@@ -3,6 +3,8 @@ import Snackbar from "../global/Snackbar";
 import { Dropdown, TextField, Checkbox, TextArea, Range, ImageInput } from "../Misc/MiscDesings";
 import MapWithInputs from "../Misc/MapWithInputs"; // Asegúrate de que la ruta sea correcta
 
+
+
 export const GeneraFormularioReporte = ({
     data = [],
     initValues = {},
@@ -425,15 +427,15 @@ export const GeneraFormularioUsuarios = ({
 };
 
 export const GeneraFormularioLogin = ({
-    data = [],          // Configuración de los campos
-    initValues = {},    // Valores iniciales
-    title,              // Título del formulario
-    description,        // Descripción del formulario
-    titleBtn,           // Texto del botón
-    msgSuccess,         // Mensaje de éxito
-    msgError,           // Mensaje de error
-    sendData,           // Endpoint del backend
-    onSuccess,          // Función para ejecutar tras éxito
+    data = [],
+    initValues = {},
+    title,
+    description,
+    titleBtn,
+    msgSuccess,
+    msgError,
+    sendData,
+    onSuccess,
 }) => {
     const [formData, setFormData] = useState(initValues);
     const [snackbar, setSnackbar] = useState(null);
@@ -448,63 +450,93 @@ export const GeneraFormularioLogin = ({
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-
         try {
-            // Simula una solicitud al servidor
-            const response = { ok: true }; // Simula una respuesta exitosa
-            if (response.ok) {
-                setSnackbar({ message: msgSuccess, type: "success" });
-                if (onSuccess) onSuccess(formData); // Pasa el formData completo a onSuccess
-            } else {
-                throw new Error(msgError);
-            }
+            console.log("Datos enviados:", formData); // Simula envío
+            setSnackbar({ message: msgSuccess, type: "success" });
+            if (onSuccess) onSuccess(formData); // Llama a la función de éxito
         } catch (error) {
-            setSnackbar({ message: error.message, type: "error" });
+            console.error("Error al enviar los datos:", error);
+            setSnackbar({ message: msgError, type: "error" });
         }
     };
 
     return (
-        <>
-            <form onSubmit={handleFormSubmit} className="p-8 bg-white shadow-md rounded-lg max-w-md mx-auto space-y-6">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold">{title}</h1>
-                    <p className="text-gray-600">{description}</p>
-                </div>
-
-                {data.map((field) => (
-                    <div key={field.name} className="mb-4">
-                        {field.type === "checkbox" ? (
-                            <Checkbox
-                                label={field.label}
-                                name={field.name}
-                                checked={formData[field.name] || false}
-                                onChange={(e) => handleChange(e, field.name)}
-                            />
-                        ) : (
-                            <TextField
-                                label={field.label}
-                                name={field.name}
-                                type={field.type}
-                                placeholder={field.placeholder}
-                                value={formData[field.name] || ""}
-                                onChange={(e) => handleChange(e, field.name)}
-                            />
-                        )}
-                    </div>
-                ))}
-
-                <button type="submit" className="w-full bg-emerald-600 text-white py-2 rounded">
-                    {titleBtn}
-                </button>
-            </form>
-
-            {snackbar && (
-                <Snackbar
-                    message={snackbar.message}
-                    type={snackbar.type}
-                    onClose={() => setSnackbar(null)}
+        <div className="bg-transparent flex justify-center items-center h-screen">
+            {/* Left: Image */}
+            <div className="w-1/2 h-screen hidden lg:block">
+                <img
+                    src="/LoginCFE.png"
+                    alt="Login"
+                    className="object-cover w-full h-full"
                 />
-            )}
-        </>
+            </div>
+            {/* Right: Form */}
+            <div className="lg:p-36 md:p-52 sm:p-20 p-8 w-full lg:w-1/2">
+                <h1 className=" text-2xl font-semibold mb-4 text-center">{title}</h1>
+                <p className="text-gray-600 mb-6 text-center">{description}</p>
+                <form onSubmit={handleFormSubmit}>
+                    {data.map((field) => {
+                        if (field.type === "checkbox") {
+                            return (
+                                <div key={field.name} className="mb-4 flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        id={field.name}
+                                        name={field.name}
+                                        className="h-4 w-4 border border-gray-300 rounded"
+                                        checked={formData[field.name] || false}
+                                        onChange={(e) => handleChange(e, field.name)}
+                                    />
+                                    <label
+                                        htmlFor={field.name}
+                                        className="text-green-900 ml-2"
+                                    >
+                                        {field.label}
+                                    </label>
+                                </div>
+                            );
+                        } else {
+                            return (
+                                <div key={field.name} className="mb-4">
+                                    <label
+                                        htmlFor={field.name}
+                                        className="block text-gray-600"
+                                    >
+                                        {field.label}
+                                    </label>
+                                    <input
+                                        type={field.type}
+                                        id={field.name}
+                                        name={field.name}
+                                        value={formData[field.name] || ""}
+                                        className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-emerald-500"
+                                        onChange={(e) => handleChange(e, field.name)}
+                                    />
+                                </div>
+                            );
+                        }
+                    })}
+                    {/* Submit Button */}
+                    <button
+                        type="submit"
+                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-md py-2 px-4 w-full"
+                    >
+                        {titleBtn}
+                    </button>
+                </form>
+                {/* Optional Snackbar */}
+                {snackbar && (
+                    <div
+                        className={`mt-4 p-4 rounded ${
+                            snackbar.type === "success"
+                                ? "bg-green-500 text-white"
+                                : "bg-red-500 text-white"
+                        }`}
+                    >
+                        {snackbar.message}
+                    </div>
+                )}
+            </div>
+        </div>
     );
 };

@@ -29,7 +29,7 @@ function App() {
         <LoadScript googleMapsApiKey="AIzaSyC-g_SwMSxKdoeYDhbXPdgC6VFBSnf3yJo">
             <div className="relative flex h-screen overflow-hidden">
                 {isAuthenticated && <Sidebar />}
-                <div className={`flex-grow overflow-auto bg-transparent pt-10 relative ${isAuthenticated ? "" : "h-screen"}`}>
+                <div className={`flex-grow overflow-auto bg-transparent ${isAuthenticated ? "pt-10" : "h-screen"}`}>
                     <Routes>
                         {/* Ruta de login (solo si no está autenticado) */}
                         <Route path="/login" element={<PublicRoute><Login setIsAuthenticated={setIsAuthenticated} /></PublicRoute>} />
