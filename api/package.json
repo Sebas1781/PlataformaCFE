@@ -13,6 +13,7 @@
   "description": "",
   "dependencies": {
     "api": "file:",
+    "bcryptjs": "^2.4.3",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",

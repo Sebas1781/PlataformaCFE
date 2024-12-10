@@ -426,19 +426,8 @@ export const GeneraFormularioUsuarios = ({
     );
 };
 
-export const GeneraFormularioLogin = ({
-    data = [],
-    initValues = {},
-    title,
-    description,
-    titleBtn,
-    msgSuccess,
-    msgError,
-    sendData,
-    onSuccess,
-}) => {
+export const GeneraFormularioLogin = ({ data, initValues, handleFormSubmit }) => {
     const [formData, setFormData] = useState(initValues);
-    const [snackbar, setSnackbar] = useState(null);
 
     const handleChange = (e, fieldName) => {
         const { type, checked, value } = e.target;
@@ -448,16 +437,9 @@ export const GeneraFormularioLogin = ({
         }));
     };
 
-    const handleFormSubmit = async (e) => {
+    const onSubmit = (e) => {
         e.preventDefault();
-        try {
-            console.log("Datos enviados:", formData); // Simula envío
-            setSnackbar({ message: msgSuccess, type: "success" });
-            if (onSuccess) onSuccess(formData); // Llama a la función de éxito
-        } catch (error) {
-            console.error("Error al enviar los datos:", error);
-            setSnackbar({ message: msgError, type: "error" });
-        }
+        handleFormSubmit(formData); // Llama a la función proporcionada con los valores del formulario
     };
 
     return (
@@ -472,71 +454,33 @@ export const GeneraFormularioLogin = ({
             </div>
             {/* Right: Form */}
             <div className="lg:p-36 md:p-52 sm:p-20 p-8 w-full lg:w-1/2">
-                <h1 className=" text-2xl font-semibold mb-4 text-center">{title}</h1>
-                <p className="text-gray-600 mb-6 text-center">{description}</p>
-                <form onSubmit={handleFormSubmit}>
-                    {data.map((field) => {
-                        if (field.type === "checkbox") {
-                            return (
-                                <div key={field.name} className="mb-4 flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id={field.name}
-                                        name={field.name}
-                                        className="h-4 w-4 border border-gray-300 rounded"
-                                        checked={formData[field.name] || false}
-                                        onChange={(e) => handleChange(e, field.name)}
-                                    />
-                                    <label
-                                        htmlFor={field.name}
-                                        className="text-green-900 ml-2"
-                                    >
-                                        {field.label}
-                                    </label>
-                                </div>
-                            );
-                        } else {
-                            return (
-                                <div key={field.name} className="mb-4">
-                                    <label
-                                        htmlFor={field.name}
-                                        className="block text-gray-600"
-                                    >
-                                        {field.label}
-                                    </label>
-                                    <input
-                                        type={field.type}
-                                        id={field.name}
-                                        name={field.name}
-                                        value={formData[field.name] || ""}
-                                        className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-emerald-500"
-                                        onChange={(e) => handleChange(e, field.name)}
-                                    />
-                                </div>
-                            );
-                        }
-                    })}
+                <h1 className="text-2xl font-semibold mb-4 text-center">{data.title}</h1>
+                <form onSubmit={onSubmit}>
+                    {data.fields.map((field) => (
+                        <div key={field.name} className="mb-4">
+                            <label htmlFor={field.name} className="block text-gray-600">
+                                {field.label}
+                            </label>
+                            <input
+                                type={field.type}
+                                id={field.name}
+                                name={field.name}
+                                value={formData[field.name] || ""}
+                                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-emerald-500"
+                                onChange={(e) => handleChange(e, field.name)}
+                            />
+                        </div>
+                    ))}
                     {/* Submit Button */}
                     <button
                         type="submit"
                         className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-md py-2 px-4 w-full"
                     >
-                        {titleBtn}
+                        {data.titleBtn}
                     </button>
                 </form>
-                {/* Optional Snackbar */}
-                {snackbar && (
-                    <div
-                        className={`mt-4 p-4 rounded ${
-                            snackbar.type === "success"
-                                ? "bg-green-500 text-white"
-                                : "bg-red-500 text-white"
-                        }`}
-                    >
-                        {snackbar.message}
-                    </div>
-                )}
             </div>
         </div>
     );
 };
+

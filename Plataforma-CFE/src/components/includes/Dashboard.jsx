@@ -2,6 +2,18 @@ import { Link } from "react-router-dom";
 import { dataMenu } from "../../data/navigationConfig";
 
 const Dashboard = () => {
+    // Obtener el tipo de usuario desde localStorage
+    const userType = localStorage.getItem("userType");
+
+    // Filtrar los elementos del menú según el tipo de usuario
+    const filteredMenuData = dataMenu.filter(item => {
+        // Si tiene restrictedTo, solo mostrarlo si coincide con el tipo de usuario
+        if (item.restrictedTo && item.restrictedTo === "admin" && userType !== "1") {
+            return false;
+        }
+        return true;
+    });
+
     return (
         <div className="flex flex-col items-center justify-start bg-white w-full p-6 sm:p-8">
             <h3 className="text-2xl sm:text-4xl text-gray-800 mb-6 tracking-wide text-center">
@@ -9,7 +21,7 @@ const Dashboard = () => {
             </h3>
             <div className="w-full max-w-5xl border-t-4 border-emerald-600 mb-8 sm:mb-12"></div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {dataMenu.map((item, index) => (
+                {filteredMenuData.map((item, index) => (
                     <Link
                         to={item.link}
                         key={index}

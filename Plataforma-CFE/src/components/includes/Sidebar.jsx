@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"; 
 import { Link, useNavigate } from "react-router-dom";
 import { dataSidebar } from "../../data/navigationConfig";
 
@@ -6,6 +6,9 @@ const Sidebar = ({ setIsAuthenticated }) => {
     const logo = "/cfe2.png";
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const navigate = useNavigate();
+
+    // Obtener el tipo de usuario desde localStorage
+    const userType = localStorage.getItem("userType");
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -24,17 +27,21 @@ const Sidebar = ({ setIsAuthenticated }) => {
         };
     }, [isSidebarOpen]);
 
-    useEffect(() => {
-        document.documentElement.style.height = "100%";
-        document.body.style.height = "100%";
-    }, []);
-
     const handleLogout = () => {
         localStorage.removeItem("isAuthenticated");
-        sessionStorage.removeItem("isAuthenticated");
+        localStorage.removeItem("userType"); // Limpia el tipo de usuario
         setIsAuthenticated(false);
-        navigate("/login"); // Redirige al login
+        navigate("/login");
     };
+
+    // Filtrar los elementos del Sidebar según el tipo de usuario
+    const filteredSidebarData = dataSidebar.filter(item => {
+        // Si tiene restrictedTo, solo mostrarlo si coincide con el tipo de usuario
+        if (item.restrictedTo && item.restrictedTo === "admin" && userType !== "1") {
+            return false;
+        }
+        return true;
+    });
 
     return (
         <>
@@ -88,7 +95,7 @@ const Sidebar = ({ setIsAuthenticated }) => {
                     </div>
 
                     <ul className="flex-grow px-4 py-6 space-y-2">
-                        {dataSidebar.map((item, index) => (
+                        {filteredSidebarData.map((item, index) => (
                             <li key={index}>
                                 {item.action === "logout" ? (
                                     <button
@@ -106,11 +113,6 @@ const Sidebar = ({ setIsAuthenticated }) => {
                                     >
                                         <item.icon className="w-5 h-5 text-emerald-600" />
                                         <span className="ml-4 text-sm font-medium">{item.name}</span>
-                                        {item.badge && (
-                                            <span className="ml-auto bg-emerald-600 text-xs text-white px-2 py-1 rounded-full">
-                                                {item.badge}
-                                            </span>
-                                        )}
                                     </Link>
                                 )}
                             </li>

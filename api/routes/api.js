@@ -261,26 +261,30 @@ api.post('/ActualizarUsuario', async (req, res) => {
 });
   
 
-api.delete('/EliminarUsuario/:id', async (req, res)=> {
-  const procedureName = "DeleteUser";
-  const {id} = req.params;
+api.post('/eliminarUsuario', async (req, res) => {
+  const { idTrabajador } = req.body; // Obtenemos el idTrabajador del cuerpo de la solicitud
+  const procedureName = 'DeleteUser';
+  const request = SysConn.request();
 
   try {
-    
-    if (!id) {
-       return res.status(400).json({message: 'El Id del usuario es obligatorio'})
-    }
+      // Asignar el parámetro al procedimiento almacenado
+      request.input('idTrabajador', mssql.Int, idTrabajador);
 
-    const request = SysConn.request();
-    request.input('idTrabajador', mssql.Int.id);
-    const result = await request.execute(procedureName);
-    res.json({message: 'Usuario eliminado exitosamente'});
+      // Ejecutar el procedimiento almacenado
+      await request.execute(procedureName);
 
+      // Respuesta exitosa
+      res.json({ message: `Usuario con ID ${idTrabajador} eliminado correctamente` });
+      console.log(`Usuario con ID ${idTrabajador} eliminado correctamente`);
   } catch (error) {
-    console.error('Error al ejecutar el Store Procedure:', error);
-    res.status(500).json({ error: 'Error al ejecutar el Store Procedure' });
+      console.error('Error al ejecutar el procedimiento almacenado:', error);
+
+      // Manejar error genérico
+      res.status(500).json({ error: 'Error al eliminar el usuario' });
   }
 });
+
+
 
 /*-----------------------------------------------------
     Propuesta de Log in
@@ -382,6 +386,45 @@ app.put('/CambiarPassword', async (req, res) => {
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
+
+api.post('/iniciarSesion', async (req, res) => {
+  const { numeroTrabajador, password } = req.body;
+  const procedureName = 'iniciarSesion'; 
+  const request = SysConn.request();
+
+  try {
+      // Asignar parámetros al procedimiento almacenado
+      request.input('p_numeroTrabajador', mssql.NVarChar(50), numeroTrabajador);
+
+      // Ejecutar el procedimiento almacenado (solo pasa numeroTrabajador)
+      const results = await request.execute(procedureName);
+
+      if (results && results.recordset && results.recordset.length > 0) {
+          const user = results.recordset[0];
+
+          // Comparar la contraseña ingresada con el hash almacenado
+          const isPasswordValid = await bcrypt.compare(password, user.password);
+
+          if (isPasswordValid) {
+              res.json({
+                  idTrabajador: user.idTrabajador,
+                  numeroTrabajador: user.numeroTrabajador,
+                  nombre: user.nombre,
+                  tipoUsuario: user.tipoUsuario,
+              });
+              console.log(`Inicio de sesión exitoso para ${numeroTrabajador}`);
+          } else {
+              res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
+          }
+      } else {
+          res.status(401).json({ message: 'Usuario o contraseña incorrectos' });
+      }
+  } catch (error) {
+      console.error('Error al ejecutar el procedimiento almacenado:', error);
+      res.status(500).json({ error: 'Error al ejecutar el procedimiento almacenado' });
+  }
+});
+
 
 
 module.exports = api;

@@ -1,122 +1,69 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import Snackbar from "../global/Snackbar"; // Import your custom snackbar component
+import { useState, useEffect } from 'react';
+import { loginFields } from '../../data/formConfig';
+import { API_URL, fetchConfigData } from '../../system/config';
+import { getPostData } from '../../system/getData';
+import { GeneraFormularioLogin } from '../global/GlobalForms';
 
-export const GeneraFormularioLogin = ({
-    data = [],
-    initValues = {},
-    title,
-    description,
-    titleBtn,
-    msgSuccess,
-    msgError,
-    onSuccess,
-}) => {
-    const [formData, setFormData] = useState(initValues);
-    const [snackbar, setSnackbar] = useState(null);
-    const navigate = useNavigate();
-
-    const handleChange = (e, fieldName) => {
-        const { type, checked, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [fieldName]: type === "checkbox" ? checked : value,
-        }));
+const Login = ({ onLogin }) => {
+    // Configuración del formulario
+    const dataConfig = {
+        title: "Iniciar sesión",
+        colorBtn: "#1D74D3",
+        titleBtn: "Iniciar sesión",
+        fields: loginFields,
+        showPasswordLink: true,
     };
 
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
+    const initValues = {
+        numeroTrabajador: '', 
+        password: '',
+    };
+
+    const [configData, setConfigData] = useState(null);
+
+    useEffect(() => {
+        const loadConfig = async () => {
+            const config = await fetchConfigData();
+            setConfigData(config);
+        };
+        loadConfig();
+    }, []);
+
+    const handleFormSubmit = async (values) => {
         try {
-            // Simular autenticación
-            if (formData.username === "admin" && formData.password === "password") {
-                localStorage.setItem("isAuthenticated", "true");
-                setSnackbar({ message: msgSuccess, type: "success" });
-                if (onSuccess) onSuccess(formData); // Notificar éxito
-                navigate("/"); // Redirigir al menú principal
+            const response = await getPostData(`${API_URL}/iniciarSesion`, values);
+    
+            if (response && response.idTrabajador) {
+                const user = response;
+    
+                if (user.status === 2) {
+                    console.log('Este usuario está desactivado. No puedes iniciar sesión.');
+                } else {
+                    // Pasa todos los datos relevantes del usuario al callback `onLogin`
+                    onLogin({
+                        idTrabajador: user.idTrabajador,
+                        numeroTrabajador: user.numeroTrabajador,
+                        nombre: user.nombre,
+                        tipoUsuario: user.tipoUsuario,
+                    });
+    
+                    console.log(`Inicio de sesión exitoso: Bienvenido, ${user.nombre}`);
+                }
             } else {
-                setSnackbar({ message: msgError || "Credenciales incorrectas, intenta denuevo", type: "error" });
+                console.log('Usuario o contraseña incorrectos.');
             }
         } catch (error) {
-            console.error("Error al procesar el login:", error);
-            setSnackbar({ message: msgError || "Error al iniciar sesión", type: "error" });
+            console.error('Error al intentar iniciar sesión:', error);
         }
     };
-
+    
     return (
-        <div className="bg-transparent flex justify-center items-center h-screen">
-            {/* Left: Image */}
-            <div className="w-1/2 h-screen hidden lg:block">
-                <img
-                    src="/LoginCFE.png"
-                    alt="Login"
-                    className="object-cover w-full h-full"
-                />
-            </div>
-            {/* Right: Form */}
-            <div className="lg:p-36 md:p-52 sm:p-20 p-8 w-full lg:w-1/2">
-                <h1 className="text-2xl font-semibold mb-4 text-center">{title}</h1>
-                <p className="text-gray-600 mb-6 text-center">{description}</p>
-                <form onSubmit={handleFormSubmit}>
-                    {data.map((field) => {
-                        if (field.type === "checkbox") {
-                            return (
-                                <div key={field.name} className="mb-4 flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id={field.name}
-                                        name={field.name}
-                                        className="h-4 w-4 border border-gray-300 rounded"
-                                        checked={formData[field.name] || false}
-                                        onChange={(e) => handleChange(e, field.name)}
-                                    />
-                                    <label
-                                        htmlFor={field.name}
-                                        className="text-green-900 ml-2"
-                                    >
-                                        {field.label}
-                                    </label>
-                                </div>
-                            );
-                        } else {
-                            return (
-                                <div key={field.name} className="mb-4">
-                                    <label
-                                        htmlFor={field.name}
-                                        className="block text-gray-600"
-                                    >
-                                        {field.label}
-                                    </label>
-                                    <input
-                                        type={field.type}
-                                        id={field.name}
-                                        name={field.name}
-                                        value={formData[field.name] || ""}
-                                        className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-emerald-500"
-                                        onChange={(e) => handleChange(e, field.name)}
-                                    />
-                                </div>
-                            );
-                        }
-                    })}
-                    {/* Submit Button */}
-                    <button
-                        type="submit"
-                        className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-md py-2 px-4 w-full"
-                    >
-                        {titleBtn}
-                    </button>
-                </form>
-                {/* Optional Snackbar */}
-                {snackbar && (
-                    <Snackbar
-                        message={snackbar.message}
-                        type={snackbar.type}
-                        onClose={() => setSnackbar(null)}
-                    />
-                )}
-            </div>
-        </div>
+        <GeneraFormularioLogin
+            data={dataConfig}
+            initValues={initValues}
+            handleFormSubmit={handleFormSubmit}
+        />
     );
 };
 
-export default GeneraFormularioLogin;
+export default Login;
