@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { dataSidebar } from "../../data/navigationConfig";
 
-const Sidebar = () => {
+const Sidebar = ({ setIsAuthenticated }) => {
     const logo = "/cfe2.png";
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -28,9 +29,15 @@ const Sidebar = () => {
         document.body.style.height = "100%";
     }, []);
 
+    const handleLogout = () => {
+        localStorage.removeItem("isAuthenticated");
+        sessionStorage.removeItem("isAuthenticated");
+        setIsAuthenticated(false);
+        navigate("/login"); // Redirige al login
+    };
+
     return (
         <>
-            {/* Botón para abrir/cerrar el Sidebar en móviles */}
             <button
                 id="menu-button"
                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
@@ -65,7 +72,6 @@ const Sidebar = () => {
                 </svg>
             </button>
 
-            {/* Sidebar */}
             <aside
                 id="sidebar"
                 className={`fixed top-0 left-0 z-40 w-72 h-full bg-white text-gray-800 shadow-lg transform transition-transform duration-500 ease-in-out ${
@@ -75,37 +81,44 @@ const Sidebar = () => {
                 style={{ height: "100vh", maxHeight: "100%" }}
             >
                 <div className="flex flex-col h-full">
-                    {/* Logo */}
                     <div className="flex items-center justify-center h-20 bg-emerald-600">
                         <Link to="/" onClick={() => setIsSidebarOpen(false)}>
                             <img src={logo} alt="Logo" className="w-40 h-30 cursor-pointer" />
                         </Link>
                     </div>
 
-                    {/* Navigation Items */}
                     <ul className="flex-grow px-4 py-6 space-y-2">
                         {dataSidebar.map((item, index) => (
                             <li key={index}>
-                                <Link
-                                    to={item.link}
-                                    className="flex items-center p-3 rounded-md hover:bg-emerald-100 transition-all"
-                                    onClick={() => setIsSidebarOpen(false)}
-                                >
-                                    <item.icon className="w-5 h-5 text-emerald-600" />
-                                    <span className="ml-4 text-sm font-medium">{item.name}</span>
-                                    {item.badge && (
-                                        <span className="ml-auto bg-emerald-600 text-xs text-white px-2 py-1 rounded-full">
-                                            {item.badge}
-                                        </span>
-                                    )}
-                                </Link>
+                                {item.action === "logout" ? (
+                                    <button
+                                        onClick={handleLogout}
+                                        className="flex items-center p-3 rounded-md hover:bg-emerald-100 transition-all w-full text-left"
+                                    >
+                                        <item.icon className="w-5 h-5 text-emerald-600" />
+                                        <span className="ml-4 text-sm font-medium">{item.name}</span>
+                                    </button>
+                                ) : (
+                                    <Link
+                                        to={item.link}
+                                        className="flex items-center p-3 rounded-md hover:bg-emerald-100 transition-all"
+                                        onClick={() => setIsSidebarOpen(false)}
+                                    >
+                                        <item.icon className="w-5 h-5 text-emerald-600" />
+                                        <span className="ml-4 text-sm font-medium">{item.name}</span>
+                                        {item.badge && (
+                                            <span className="ml-auto bg-emerald-600 text-xs text-white px-2 py-1 rounded-full">
+                                                {item.badge}
+                                            </span>
+                                        )}
+                                    </Link>
+                                )}
                             </li>
                         ))}
                     </ul>
                 </div>
             </aside>
 
-            {/* Overlay para cerrar el Sidebar en móviles */}
             {isSidebarOpen && (
                 <div
                     className="fixed inset-0 z-30 bg-black/50 sm:hidden transition-opacity duration-500 ease-in-out"

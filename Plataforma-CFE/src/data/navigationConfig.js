@@ -18,30 +18,31 @@ export const dataMenu = [
       },
 ]
 //
+
 export const dataSidebar = [
-    {
-        name: "Dashboard",
-        icon: FaHome,
-        link: "/",
-      },
-      {
-        name: "Perfil",
-        icon: FaUser,
-        link: "/perfil",
-      },
-      {
-        name: "Reportes",
-        icon: FaTable,
-        link: "/reportes",
-      },
-      {
-        name: "Usuarios",
-        icon: FaUsers,
-        link: "/usuarios",
-      },
-      {
-        name:"Cerrar Sesión",
-        icon: FaSignOutAlt,
-        link:"/cerrarSesion",
-      }
+  {
+      name: "Dashboard",
+      icon: FaHome,
+      link: "/",
+  },
+  {
+      name: "Perfil",
+      icon: FaUser,
+      link: "/perfil",
+  },
+  {
+      name: "Reportes",
+      icon: FaTable,
+      link: "/reportes",
+  },
+  {
+      name: "Usuarios",
+      icon: FaUsers,
+      link: "/usuarios",
+  },
+  {
+      name: "Cerrar Sesión",
+      icon: FaSignOutAlt,
+      action: "logout", // Nueva propiedad
+  },
 ]
