@@ -183,9 +183,6 @@ api.post('/agregarReporte', async (req, res) => {
   }
 });
 
-
-
-
 /*-----------------------------------------------------
     End Points by Carlos
 -------------------------------------------------------*/
@@ -215,7 +212,6 @@ api.post('/AgregarUsuario', async(req, res) =>{
     res.status(500).json({ error: 'Error al ejecutar el Store Procedure' });
   }
 });
-
 
 api.post('/ObtenerUsuario', async(req, res) =>{
   const {idTrabajador} = req.body;
@@ -260,7 +256,6 @@ api.post('/ActualizarUsuario', async (req, res) => {
   }
 });
   
-
 api.post('/eliminarUsuario', async (req, res) => {
   const { idTrabajador } = req.body; // Obtenemos el idTrabajador del cuerpo de la solicitud
   const procedureName = 'DeleteUser';
@@ -284,8 +279,6 @@ api.post('/eliminarUsuario', async (req, res) => {
   }
 });
 
-
-
 /*-----------------------------------------------------
     Propuesta de Log in
 -------------------------------------------------------*/
@@ -299,7 +292,6 @@ app.use(session({
   saveUninitialized: false,   // No guardar sesiones vacías
   cookie: { maxAge: 8 * 60 * 60 * 1000 } // Sesión válida por 8 horas
 }));
-
 
 app.post('/login', async (req, res) => {
   const { numeroTrabajador, password } = req.body;
@@ -424,7 +416,5 @@ api.post('/iniciarSesion', async (req, res) => {
       res.status(500).json({ error: 'Error al ejecutar el procedimiento almacenado' });
   }
 });
-
-
 
 module.exports = api;

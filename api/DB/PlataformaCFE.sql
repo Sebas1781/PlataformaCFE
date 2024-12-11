@@ -3,7 +3,7 @@ GO
 
 -- Tabla de Usuarios
 CREATE TABLE Usuarios (
-	idTrabajador INT PRIMARY KEY IDENTITY(1,1), -- Agregado el autoincremento
+	idTrabajador INT PRIMARY KEY IDENTITY(1,1), 
     numeroTrabajador NVARCHAR(100) NOT NULL,
     nombre NVARCHAR(100) NOT NULL,
     password NVARCHAR(100) NOT NULL,

@@ -1,7 +1,7 @@
 import React, { useState, useRef } from "react";
 import Snackbar from "../global/Snackbar";
 import { Dropdown, TextField, Checkbox, TextArea, Range, ImageInput } from "../Misc/MiscDesings";
-import MapWithInputs from "../Misc/MapWithInputs"; // Asegúrate de que la ruta sea correcta
+import MapWithInputs from "../Misc/MapWithInputs"; 
 
 
 
@@ -21,12 +21,14 @@ export const GeneraFormularioReporte = ({
     const [errors, setErrors] = useState({});
     const fieldRefs = useRef({});
 
+    // Función para calcular el VSWR
     const calculateVSWR = (incidentPower, reflectedPower) => {
         if (incidentPower === 0) return 0; // Avoid division by zero
         const ratio = Math.sqrt(reflectedPower / incidentPower);
         return ((1 + ratio) / (1 - ratio)).toFixed(3); // Limit to 3 decimal places
     };
 
+    // Manejador de cambios en los campos
     const handleChange = (e, fieldName) => {
         const { type, checked, value } = e.target;
         setFormData((prev) => {
@@ -35,10 +37,11 @@ export const GeneraFormularioReporte = ({
                 [fieldName]: type === "checkbox" ? (checked ? 1 : 0) : value,
             };
 
-            if (fieldName === "potenciaIncidente" || fieldName === "potenciaReflejada") {
-                const incidentPower = parseFloat(updatedData["potenciaIncidente"]) || 0;
-                const reflectedPower = parseFloat(updatedData["potenciaReflejada"]) || 0;
-                updatedData["vswr"] = calculateVSWR(incidentPower, reflectedPower);
+            // Actualización dinámica de VSWR
+            if (["potenciaIncidente", "potenciaReflejada"].includes(fieldName)) {
+                const incidentPower = parseFloat(updatedData.potenciaIncidente) || 0;
+                const reflectedPower = parseFloat(updatedData.potenciaReflejada) || 0;
+                updatedData.vswr = calculateVSWR(incidentPower, reflectedPower);
             }
 
             return updatedData;
@@ -49,106 +52,77 @@ export const GeneraFormularioReporte = ({
         }
     };
 
-    const handleMapChange = (location, fieldName) => {
-        setFormData((prev) => ({
-            ...prev,
-            [fieldName]: location, // Actualizamos el objeto completo (latitud y longitud)
-        }));
-        if (errors[fieldName]) {
-            setErrors((prev) => ({ ...prev, [fieldName]: false }));
-        }
-    };
-
-    const handleFileChange = (e, fieldName) => {
-        const file = e.target.files[0];
-        setFormData((prev) => ({
-            ...prev,
-            [fieldName]: file,
-        }));
-        if (errors[fieldName]) {
-            setErrors((prev) => ({ ...prev, [fieldName]: false }));
-        }
-    };
-
+    // Validación de la sección actual
     const validateCurrentSection = () => {
         const currentFields = data[currentSection]?.fields || [];
         const newErrors = {};
-        let firstErrorField = null;
 
         currentFields.forEach((field) => {
             const value = formData[field.name];
-            if (field.required) {
-                if (!value || (Array.isArray(value) && value.length === 0)) {
-                    newErrors[field.name] = true;
-                    if (!firstErrorField) firstErrorField = field.name;
-                }
+            if (field.required && (!value || (Array.isArray(value) && value.length === 0))) {
+                newErrors[field.name] = true;
             }
         });
 
         setErrors(newErrors);
 
-        if (firstErrorField && fieldRefs.current[firstErrorField]) {
-            fieldRefs.current[firstErrorField].focus();
-        }
-
         if (Object.keys(newErrors).length > 0) {
             setSnackbar({
-                message: "Faltan campos por llenar. Por favor, revisa la sección.",
+                message: "Faltan campos obligatorios en esta sección.",
                 type: "error",
             });
             return false;
         }
-
         return true;
     };
 
+    // Manejo de navegación entre secciones
     const handleNextSection = (e) => {
         e.preventDefault();
-        if (!validateCurrentSection()) return;
-        if (currentSection < data.length - 1) {
+        if (validateCurrentSection()) {
             setCurrentSection((prev) => prev + 1);
         }
     };
 
     const handlePreviousSection = (e) => {
         e.preventDefault();
-        if (currentSection > 0) {
-            setCurrentSection((prev) => prev - 1);
-        }
+        setCurrentSection((prev) => Math.max(prev - 1, 0));
     };
 
+    // Envío del formulario
     const handleFormSubmit = async (e) => {
         e.preventDefault();
         if (!validateCurrentSection()) return;
-        // Ensure all checkboxes are set to 0 if not selected
+
+        // Asegurar que todos los checkboxes no marcados estén en 0
         const updatedFormData = { ...formData };
-        data.forEach(section => {
-            section.fields.forEach(field => {
+        data.forEach((section) => {
+            section.fields.forEach((field) => {
                 if (field.type === "checkbox" && !updatedFormData[field.name]) {
                     updatedFormData[field.name] = 0;
                 }
             });
         });
+
         try {
-            console.log("Enviando datos a:", sendData);
-            console.log("Datos del formulario:", updatedFormData);
-            setSnackbar({ message: msgSuccess, type: "success" });
+            const response = await sendData(updatedFormData);
+            if (response.success) {
+                setSnackbar({ message: msgSuccess, type: "success" });
+                setFormData(initValues); // Resetear formulario tras éxito
+                setCurrentSection(0); // Volver a la primera sección
+            } else {
+                setSnackbar({ message: msgError, type: "error" });
+            }
         } catch (error) {
             console.error("Error al enviar los datos:", error);
             setSnackbar({ message: msgError, type: "error" });
         }
     };
 
+    // Renderizado de campos
     const renderField = (field) => {
-        const value = formData[field.name] || (field.type === "map" ? { lat: 0, lng: 0 } : ""); // Ensure valid LatLngLiteral
+        const value = formData[field.name] || (field.type === "map" ? { lat: 0, lng: 0 } : "");
         const hasError = errors[field.name];
-
-        const baseStyles = "border rounded-lg";
-        const errorStyles = hasError ? "border-red-500" : "border-gray-300";
-
-        const refCallback = (el) => {
-            fieldRefs.current[field.name] = el;
-        };
 
         switch (field.type) {
             case "text":
@@ -157,85 +131,71 @@ export const GeneraFormularioReporte = ({
             case "time":
                 return (
                     <TextField
-                        label={field.label}
-                        name={field.name}
-                        type={field.type}
-                        placeholder={field.placeholder}
+                        key={field.name}
+                        {...field}
                         value={value}
+                        error={hasError}
                         onChange={(e) => handleChange(e, field.name)}
-                        className={`${baseStyles} ${errorStyles}`}
-                        ref={refCallback}
-                        readOnly={field.name === "vswr"}
                     />
                 );
             case "textarea":
                 return (
                     <TextArea
-                        label={field.label}
-                        name={field.name}
-                        placeholder={field.placeholder}
+                        key={field.name}
+                        {...field}
                         value={value}
+                        error={hasError}
                         onChange={(e) => handleChange(e, field.name)}
-                        className={`${baseStyles} ${errorStyles}`}
-                        ref={refCallback}
                     />
                 );
             case "select":
                 return (
                     <Dropdown
-                        label={field.label}
-                        options={field.options}
+                        key={field.name}
+                        {...field}
                         value={value}
+                        error={hasError}
                         onSelect={(selectedValue) =>
-                            setFormData((prev) => ({
-                                ...prev,
-                                [field.name]: selectedValue,
-                            }))
+                            setFormData((prev) => ({ ...prev, [field.name]: selectedValue }))
                         }
-                        className={`${baseStyles} ${errorStyles}`}
-                        ref={refCallback}
                     />
                 );
             case "checkbox":
                 return (
                     <Checkbox
-                        label={field.label}
-                        name={field.name}
-                        checked={value}
+                        key={field.name}
+                        {...field}
+                        checked={!!value}
+                        error={hasError}
                         onChange={(e) => handleChange(e, field.name)}
-                        className={`${baseStyles} ${errorStyles}`}
-                        ref={refCallback}
                     />
                 );
             case "range":
                 return (
                     <Range
-                        label={field.label}
-                        name={field.name}
-                        min={field.min}
-                        max={field.max}
+                        key={field.name}
+                        {...field}
                         value={value}
+                        error={hasError}
                         onChange={(e) => handleChange(e, field.name)}
-                        className={`${baseStyles} ${errorStyles}`}
-                        ref={refCallback}
                     />
                 );
             case "image":
                 return (
                     <ImageInput
-                        label={field.label}
-                        name={field.name}
+                        key={field.name}
+                        {...field}
+                        error={hasError}
                         onChange={(e) => handleFileChange(e, field.name)}
-                        className={`${baseStyles} ${errorStyles}`}
-                        ref={refCallback}
                     />
                 );
             case "map":
                 return (
                     <MapWithInputs
+                        key={field.name}
+                        {...field}
                         value={value}
                         onChange={(location) => handleMapChange(location, field.name)}
-                        className={`${baseStyles} ${errorStyles}`}
                     />
                 );
             default:
@@ -244,47 +204,43 @@ export const GeneraFormularioReporte = ({
     };
 
     return (
-        <>
-            <form onSubmit={handleFormSubmit} className="max-w-5xl mx-auto p-8 bg-white rounded-lg space-y-8">
-                <div className="text-center">
-                    <h1 className="text-4xl font-bold text-emerald-600">{title}</h1>
-                    <p className="text-gray-500">{description}</p>
-                </div>
+        <form onSubmit={handleFormSubmit} className="max-w-5xl mx-auto p-8 bg-white rounded-lg space-y-8">
+            <div className="text-center">
+                <h1 className="text-4xl font-bold text-emerald-600">{title}</h1>
+                <p className="text-gray-500">{description}</p>
+            </div>
 
-                {data[currentSection]?.fields.map((field, index) => (
-                    <div key={index} className="flex flex-col space-y-4">
-                        {renderField(field)}
-                    </div>
-                ))}
+            <div className="space-y-4">
+                {data[currentSection]?.fields.map((field) => renderField(field))}
+            </div>
 
-                <div className="flex justify-between">
-                    {currentSection > 0 && (
-                        <button
-                            type="button"
-                            onClick={handlePreviousSection}
-                            className="px-6 py-2 bg-gray-300 rounded text-gray-700 hover:bg-gray-400"
-                        >
-                            Anterior
-                        </button>
-                    )}
-                    {currentSection < data.length - 1 ? (
-                        <button
-                            type="button"
-                            onClick={handleNextSection}
-                            className="px-6 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
-                        >
-                            Siguiente
-                        </button>
-                    ) : (
-                        <button
-                            type="submit"
-                            className="px-6 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
-                        >
-                            {titleBtn}
-                        </button>
-                    )}
-                </div>
-            </form>
+            <div className="flex justify-between">
+                {currentSection > 0 && (
+                    <button
+                        type="button"
+                        onClick={handlePreviousSection}
+                        className="px-6 py-2 bg-gray-300 rounded text-gray-700 hover:bg-gray-400"
+                    >
+                        Anterior
+                    </button>
+                )}
+                {currentSection < data.length - 1 ? (
+                    <button
+                        type="button"
+                        onClick={handleNextSection}
+                        className="px-6 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
+                    >
+                        Siguiente
+                    </button>
+                ) : (
+                    <button
+                        type="submit"
+                        className="px-6 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
+                    >
+                        {titleBtn}
+                    </button>
+                )}
+            </div>
 
             {snackbar && snackbar.message && (
                 <Snackbar
@@ -294,9 +250,10 @@ export const GeneraFormularioReporte = ({
                     onClose={() => setSnackbar(null)}
                 />
             )}
-        </>
+        </form>
     );
 };
+
 
 export const GeneraFormularioUsuarios = ({
     data = [],

@@ -84,7 +84,7 @@ const NewReport = () => {
         titleBtn: "Crear Reporte",
         msgSuccess: "Reporte creado exitosamente",
         msgError: "Error al crear el reporte",
-        sendData: "agregarReporte",
+        sendData: "InsertReporte",
     };
 
     return <GeneraFormularioReporte {...formProps} />;

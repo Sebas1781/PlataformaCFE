@@ -2,7 +2,6 @@ export const reportFields = [
     {
         sectionName: 'Información Básica:',
         fields: [
-            { label: 'Cambio de supresor:', name: 'cambioSupresor', type: 'checkbox' },
             { label: 'Tipo de mantenimiento:', name: 'tipoMantenimiento', type: 'select', options: ['Mantenimiento Preventivo', 'Mantenimiento Correctivo', 'Puesta en servicio'], required: true },
             { label: 'Modelo UTR:', name: 'modelo', type: 'select', options: ['Opcion 1', 'Opcion 2', 'Opcion 3', 'Opcion 4', 'Opcion 5'], required: true },
             { label: 'Fecha de mantenimiento:', name: 'fecha', type: 'date', required: true},

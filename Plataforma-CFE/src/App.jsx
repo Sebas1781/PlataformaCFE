@@ -20,7 +20,6 @@ function App() {
     });
 
     useEffect(() => {
-        // Sincroniza el estado de autenticación y el tipo de usuario con localStorage
         localStorage.setItem("isAuthenticated", isAuthenticated);
         if (userType) {
             localStorage.setItem("userType", userType);
