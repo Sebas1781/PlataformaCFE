@@ -5,58 +5,46 @@ import { getPostData } from '../../system/getData';
 import { GeneraFormularioLogin } from '../global/GlobalForms';
 
 const Login = ({ onLogin }) => {
-    // Configuración del formulario
     const dataConfig = {
         title: "Iniciar sesión",
-        colorBtn: "#1D74D3",
         titleBtn: "Iniciar sesión",
         fields: loginFields,
-        showPasswordLink: true,
     };
 
     const initValues = {
-        numeroTrabajador: '', 
+        numeroTrabajador: '',
         password: '',
+        rememberMe: 1, // Checkbox predeterminado
     };
-
-    const [configData, setConfigData] = useState(null);
-
-    useEffect(() => {
-        const loadConfig = async () => {
-            const config = await fetchConfigData();
-            setConfigData(config);
-        };
-        loadConfig();
-    }, []);
 
     const handleFormSubmit = async (values) => {
         try {
             const response = await getPostData(`${API_URL}/iniciarSesion`, values);
-    
             if (response && response.idTrabajador) {
                 const user = response;
-    
                 if (user.status === 2) {
-                    console.log('Este usuario está desactivado. No puedes iniciar sesión.');
+                    console.log('Usuario desactivado.');
+                    return false;
                 } else {
-                    // Pasa todos los datos relevantes del usuario al callback `onLogin`
                     onLogin({
                         idTrabajador: user.idTrabajador,
                         numeroTrabajador: user.numeroTrabajador,
                         nombre: user.nombre,
                         tipoUsuario: user.tipoUsuario,
                     });
-    
-                    console.log(`Inicio de sesión exitoso: Bienvenido, ${user.nombre}`);
+                    console.log(`Bienvenido, ${user.nombre}`);
+                    return true;
                 }
             } else {
-                console.log('Usuario o contraseña incorrectos.');
+                console.log('Credenciales incorrectas.');
+                return false;
             }
         } catch (error) {
-            console.error('Error al intentar iniciar sesión:', error);
+            console.error('Error al iniciar sesión:', error);
+            return false;
         }
     };
-    
+
     return (
         <GeneraFormularioLogin
             data={dataConfig}

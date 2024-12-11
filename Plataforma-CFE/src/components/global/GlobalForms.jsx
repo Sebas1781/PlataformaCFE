@@ -4,7 +4,6 @@ import { Dropdown, TextField, Checkbox, TextArea, Range, ImageInput } from "../M
 import MapWithInputs from "../Misc/MapWithInputs"; 
 
 
-
 export const GeneraFormularioReporte = ({
     data = [],
     initValues = {},
@@ -13,7 +12,7 @@ export const GeneraFormularioReporte = ({
     titleBtn,
     msgSuccess,
     msgError,
-    sendData,
+    sendData = async () => ({ success: false }), // Default value
 }) => {
     const [formData, setFormData] = useState(initValues);
     const [currentSection, setCurrentSection] = useState(0);
@@ -30,11 +29,11 @@ export const GeneraFormularioReporte = ({
 
     // Manejador de cambios en los campos
     const handleChange = (e, fieldName) => {
-        const { type, checked, value } = e.target;
+        const { type, value } = e.target;
         setFormData((prev) => {
             const updatedData = {
                 ...prev,
-                [fieldName]: type === "checkbox" ? (checked ? 1 : 0) : value,
+                [fieldName]: type === "checkbox" ? parseInt(value, 10) : value, // Convert checkbox value to 0 or 1
             };
 
             // Actualización dinámica de VSWR
@@ -121,7 +120,7 @@ export const GeneraFormularioReporte = ({
 
     // Renderizado de campos
     const renderField = (field) => {
-        const value = formData[field.name] || (field.type === "map" ? { lat: 0, lng: 0 } : "");
+        const value = formData[field.name] || (field.type === "checkbox" ? 0 : ""); // Default para checkboxes
         const hasError = errors[field.name];
 
         switch (field.type) {
@@ -165,7 +164,7 @@ export const GeneraFormularioReporte = ({
                     <Checkbox
                         key={field.name}
                         {...field}
-                        checked={!!value}
+                        checked={value}
                         error={hasError}
                         onChange={(e) => handleChange(e, field.name)}
                     />
@@ -203,6 +202,21 @@ export const GeneraFormularioReporte = ({
         }
     };
 
+    const handleMapChange = (location, fieldName) => {
+        setFormData((prev) => ({
+            ...prev,
+            [fieldName]: { lat: location.lat, lng: location.lng },
+        }));
+    };
+
+    const handleFileChange = (e, fieldName) => {
+        const file = e.target.files[0];
+        setFormData((prev) => ({
+            ...prev,
+            [fieldName]: file,
+        }));
+    };
+
     return (
         <form onSubmit={handleFormSubmit} className="max-w-5xl mx-auto p-8 bg-white rounded-lg space-y-8">
             <div className="text-center">
@@ -218,7 +232,7 @@ export const GeneraFormularioReporte = ({
                 {currentSection > 0 && (
                     <button
                         type="button"
-                        onClick={handlePreviousSection}
+                        onClick={() => setCurrentSection((prev) => Math.max(prev - 1, 0))}
                         className="px-6 py-2 bg-gray-300 rounded text-gray-700 hover:bg-gray-400"
                     >
                         Anterior
@@ -227,7 +241,7 @@ export const GeneraFormularioReporte = ({
                 {currentSection < data.length - 1 ? (
                     <button
                         type="button"
-                        onClick={handleNextSection}
+                        onClick={() => setCurrentSection((prev) => prev + 1)}
                         className="px-6 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700"
                     >
                         Siguiente
@@ -243,16 +257,14 @@ export const GeneraFormularioReporte = ({
             </div>
 
             {snackbar && snackbar.message && (
-                <Snackbar
-                    message={snackbar.message}
-                    type={snackbar.type}
-                    duration={3000}
-                    onClose={() => setSnackbar(null)}
-                />
+                <div className={`mt-4 p-4 rounded ${snackbar.type === "success" ? "bg-green-500" : "bg-red-500"} text-white`}>
+                    {snackbar.message}
+                </div>
             )}
         </form>
     );
 };
+
 
 
 export const GeneraFormularioUsuarios = ({
@@ -383,25 +395,34 @@ export const GeneraFormularioUsuarios = ({
     );
 };
 
+
 export const GeneraFormularioLogin = ({ data, initValues, handleFormSubmit }) => {
     const [formData, setFormData] = useState(initValues);
+    const [snackbar, setSnackbar] = useState(null);
 
     const handleChange = (e, fieldName) => {
-        const { type, checked, value } = e.target;
+        const { type, value } = e.target;
         setFormData((prev) => ({
             ...prev,
-            [fieldName]: type === "checkbox" ? checked : value,
+            [fieldName]: type === "checkbox" ? value : e.target.value,
         }));
     };
 
-    const onSubmit = (e) => {
+    const onSubmit = async (e) => {
         e.preventDefault();
-        handleFormSubmit(formData); // Llama a la función proporcionada con los valores del formulario
+        try {
+            const isValid = await handleFormSubmit(formData);
+            if (!isValid) {
+                setSnackbar({ message: "Credenciales incorrectas", type: "error" });
+            }
+        } catch (error) {
+            console.error("Error al enviar el formulario:", error);
+            setSnackbar({ message: "Error al procesar la solicitud", type: "error" });
+        }
     };
 
     return (
         <div className="bg-transparent flex justify-center items-center h-screen">
-            {/* Left: Image */}
             <div className="w-1/2 h-screen hidden lg:block">
                 <img
                     src="/LoginCFE.png"
@@ -409,26 +430,38 @@ export const GeneraFormularioLogin = ({ data, initValues, handleFormSubmit }) =>
                     className="object-cover w-full h-full"
                 />
             </div>
-            {/* Right: Form */}
             <div className="lg:p-36 md:p-52 sm:p-20 p-8 w-full lg:w-1/2">
                 <h1 className="text-2xl font-semibold mb-4 text-center">{data.title}</h1>
                 <form onSubmit={onSubmit}>
-                    {data.fields.map((field) => (
-                        <div key={field.name} className="mb-4">
-                            <label htmlFor={field.name} className="block text-gray-600">
-                                {field.label}
-                            </label>
-                            <input
-                                type={field.type}
-                                id={field.name}
-                                name={field.name}
-                                value={formData[field.name] || ""}
-                                className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-emerald-500"
-                                onChange={(e) => handleChange(e, field.name)}
-                            />
-                        </div>
-                    ))}
-                    {/* Submit Button */}
+                    {data.fields.map((field) => {
+                        if (field.type === "checkbox") {
+                            return (
+                                <div key={field.name} className="mb-4">
+                                    <Checkbox
+                                        label={field.label}
+                                        name={field.name}
+                                        checked={formData[field.name] || 0}
+                                        onChange={(e) => handleChange(e, field.name)}
+                                    />
+                                </div>
+                            );
+                        }
+                        return (
+                            <div key={field.name} className="mb-4">
+                                <label htmlFor={field.name} className="block text-gray-600">
+                                    {field.label}
+                                </label>
+                                <input
+                                    type={field.type}
+                                    id={field.name}
+                                    name={field.name}
+                                    value={formData[field.name] || ""}
+                                    className="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:border-emerald-500"
+                                    onChange={(e) => handleChange(e, field.name)}
+                                />
+                            </div>
+                        );
+                    })}
                     <button
                         type="submit"
                         className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-md py-2 px-4 w-full"
@@ -436,6 +469,15 @@ export const GeneraFormularioLogin = ({ data, initValues, handleFormSubmit }) =>
                         {data.titleBtn}
                     </button>
                 </form>
+                {snackbar && (
+                    <div
+                        className={`mt-4 p-4 rounded ${
+                            snackbar.type === "success" ? "bg-green-500" : "bg-red-500"
+                        } text-white`}
+                    >
+                        {snackbar.message}
+                    </div>
+                )}
             </div>
         </div>
     );

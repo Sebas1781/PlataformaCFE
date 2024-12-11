@@ -110,31 +110,32 @@ export const Dropdown = forwardRef(({ label, options, placeholder = "Seleccione 
     );
 });
 
-// Checkbox Component
-export const Checkbox = forwardRef(({ label, name, checked, onChange, className }, ref) => (
+export const Checkbox = ({ label, name, checked, onChange }) => (
     <div className="flex items-center space-x-3">
-        <label htmlFor={name} className="relative flex cursor-pointer items-center p-3 rounded-full">
-            <input
-                ref={ref}
-                id={name}
-                name={name}
-                type="checkbox"
-                checked={checked === 1}
-                onChange={(e) => onChange({ ...e, target: { ...e.target, checked: e.target.checked ? 1 : 0 } })}
-                className={`peer relative h-5 w-5 appearance-none rounded-md border transition-all 
-                           cursor-pointer before:absolute before:top-2/4 before:left-2/4 before:h-12 before:w-12 
-                           before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-emerald-500 
-                           before:opacity-0 before:transition-opacity checked:border-emerald-600 checked:bg-emerald-600 
-                           checked:before:bg-emerald-600 hover:before:opacity-10 focus:outline-none ${className}`}
-            />
-        </label>
+        <input
+            id={name}
+            name={name}
+            type="checkbox"
+            checked={checked === 1} // Convertimos 1 a true
+            onChange={(e) => {
+                const isChecked = e.target.checked ? 1 : 0; // Convertimos true/false a 1/0
+                onChange({ target: { name, value: isChecked } });
+            }}
+            className="peer relative h-5 w-5 appearance-none rounded-md border border-gray-300 transition-all 
+                       cursor-pointer before:absolute before:top-2/4 before:left-2/4 before:h-12 before:w-12 
+                       before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-emerald-500 
+                       before:opacity-0 before:transition-opacity checked:border-emerald-600 checked:bg-emerald-600 
+                       checked:before:bg-emerald-600 hover:before:opacity-10 focus:outline-none"
+        />
         {label && (
             <label htmlFor={name} className="text-sm font-medium text-gray-800">
                 {label}
             </label>
         )}
     </div>
-));
+);
+
+
 
 // Range Component
 export const Range = forwardRef(({ label, name, min = 0, max = 100, value, onChange, className }, ref) => {

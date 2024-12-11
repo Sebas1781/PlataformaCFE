@@ -51,7 +51,7 @@ const Sidebar = ({ setIsAuthenticated }) => {
                 aria-controls="sidebar"
                 type="button"
                 className={`fixed top-4 left-4 z-50 p-2 bg-emerald-600 rounded-md text-white sm:hidden transition-transform duration-500 ease-in-out ${
-                    isSidebarOpen ? "translate-x-72" : "translate-x-0"
+                    isSidebarOpen ? "translate-x-60" : "translate-x-0"
                 }`}
                 style={{ zIndex: 101 }}
             >
@@ -81,7 +81,7 @@ const Sidebar = ({ setIsAuthenticated }) => {
 
             <aside
                 id="sidebar"
-                className={`fixed top-0 left-0 z-40 w-72 h-full bg-white text-gray-800 shadow-lg transform transition-transform duration-500 ease-in-out ${
+                className={`fixed top-0 left-0 z-40 w-60 h-full bg-white text-gray-800 shadow-lg transform transition-transform duration-500 ease-in-out ${
                     isSidebarOpen ? "translate-x-0 shadow-xl" : "-translate-x-full"
                 } sm:translate-x-0 sm:relative sm:transform-none overflow-y-auto`}
                 aria-label="Sidebar"
