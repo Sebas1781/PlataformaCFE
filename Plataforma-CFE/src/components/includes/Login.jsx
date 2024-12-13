@@ -14,7 +14,7 @@ const Login = ({ onLogin }) => {
     const initValues = {
         numeroTrabajador: '',
         password: '',
-        rememberMe: 1, // Checkbox predeterminado
+        rememberMe: 0, // Checkbox predeterminado
     };
 
     const handleFormSubmit = async (values) => {
