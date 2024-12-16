@@ -3,6 +3,7 @@ import Snackbar from "../global/Snackbar";
 import { Dropdown, TextField, Checkbox, TextArea, Range, ImageInput } from "../Misc/MiscDesings";
 import MapWithInputs from "../Misc/MapWithInputs";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 export const GeneraFormularioReporte = ({
   data = [],
@@ -18,6 +19,7 @@ export const GeneraFormularioReporte = ({
   const [currentSection, setCurrentSection] = useState(0);
   const [snackbar, setSnackbar] = useState(null);
   const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
 
   // Guarda refs de todos los campos
   const fieldRefs = useRef({});
@@ -84,7 +86,6 @@ export const GeneraFormularioReporte = ({
       if (firstErrorField && fieldRefs.current[firstErrorField]) {
         fieldRefs.current[firstErrorField].focus();
       }
-
       return false;
     }
     return true;
@@ -124,6 +125,7 @@ export const GeneraFormularioReporte = ({
         setSnackbar({ message: msgSuccess, type: "success" });
         setFormData(initValues);
         setCurrentSection(0);
+        navigate("/reportes");
       } else {
         setSnackbar({ message: msgError, type: "error" });
       }
@@ -146,7 +148,7 @@ export const GeneraFormularioReporte = ({
         return (
           <TextField
             key={field.name}
-            ref={(el) => (fieldRefs.current[field.name] = el)} // <--- Guardar ref
+            ref={(el) => (fieldRefs.current[field.name] = el)}
             {...field}
             value={value}
             error={hasError}
@@ -178,7 +180,6 @@ export const GeneraFormularioReporte = ({
           />
         );
       case "checkbox":
-        // El "focus" para un checkbox es menos común, pero lo guardamos igual
         return (
           <Checkbox
             key={field.name}
@@ -211,7 +212,6 @@ export const GeneraFormularioReporte = ({
           />
         );
       case "map":
-        // Para un mapa, el "focus" es diferente, pero igual guardamos la ref
         return (
           <MapWithInputs
             key={field.name}
@@ -242,7 +242,10 @@ export const GeneraFormularioReporte = ({
   };
 
   return (
-    <form onSubmit={handleFormSubmit} className="max-w-5xl mx-auto p-8 bg-white rounded-lg space-y-8">
+    <form
+      onSubmit={handleFormSubmit}
+      className="max-w-5xl mx-auto p-8 bg-white rounded-lg space-y-8"
+    >
       <div className="text-center">
         <h1 className="text-4xl font-bold text-emerald-600">{title}</h1>
         <p className="text-gray-500">{description}</p>
@@ -420,8 +423,6 @@ export const GeneraFormularioUsuarios = ({
         </>
     );
 };
-
-
 
 export const GeneraFormularioLogin = ({ data, initValues, handleFormSubmit }) => {
   const [formData, setFormData] = useState(initValues);
