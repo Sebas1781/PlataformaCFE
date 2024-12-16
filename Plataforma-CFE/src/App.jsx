@@ -10,6 +10,7 @@ import ProfileDetails from "./modules/profile/ProfileDetails";
 import ReportTables from "./modules/reports/ReportTables";
 import ChangePassword from "./modules/profile/ChangePassword";
 import Login from "./components/includes/Login";
+import UserTables from './modules/users/UserTables';
 
 function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(() => {
@@ -62,12 +63,13 @@ function App() {
                         <Route path="/perfil" element={<PrivateRoute><ProfileDetails /></PrivateRoute>} />
                         <Route path="/cambiar/contraseña" element={<PrivateRoute><ChangePassword /></PrivateRoute>} />
                         <Route path="/reportes" element={<PrivateRoute><ReportTables /></PrivateRoute>} />
+                        <Route path="/usuarios" element={<PrivateRoute><UserTables /></PrivateRoute>} />
 
                         {/* Rutas restringidas a administradores */}
                         {userType === "1" && (
                             <>
                                 <Route path="/nuevo/usuario" element={<PrivateRoute><AddUser /></PrivateRoute>} />
-                                <Route path="/editar/usuario" element={<PrivateRoute><EditUser /></PrivateRoute>} />
+                                <Route path="/editar/usuario/:id" element={<PrivateRoute><EditUser /></PrivateRoute>} />
                             </>
                         )}
                     </Routes>

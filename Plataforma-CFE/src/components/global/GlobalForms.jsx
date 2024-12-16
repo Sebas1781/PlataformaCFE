@@ -278,108 +278,73 @@ export const GeneraFormularioUsuarios = ({
 
     const handleFormSubmit = async (e) => {
         e.preventDefault();
-        // Ensure all checkboxes are set to 0 if not selected
-        const updatedFormData = { ...formData };
-        data.forEach(section => {
-            section.fields.forEach(field => {
-                if (field.type === "checkbox" && !updatedFormData[field.name]) {
-                    updatedFormData[field.name] = 0;
-                }
-            });
-        });
-        try {
-            console.log("Enviando datos a:", sendData);
-            console.log("Datos del formulario:", updatedFormData);
-            setSnackbar({ message: msgSuccess, type: "success" });
-        } catch (error) {
-            console.error("Error al enviar los datos:", error);
-            setSnackbar({ message: msgError, type: "error" });
-        }
+        // Simulación de envío
+        console.log("Datos enviados:", formData);
+
+        // Mensaje de éxito
+        setSnackbar({ message: msgSuccess, type: "success" });
     };
 
     return (
-        <>
-            <form
-                onSubmit={handleFormSubmit}
-                className="max-w-3xl mx-auto space-y-8 p-8 bg-gradient-to-br from-white rounded-lg shadow-md"
-            >
-                {/* Encabezado */}
-                <div className="text-center">
-                    <h1 className="text-4xl font-extrabold text-emerald-600 tracking-tight">{title}</h1>
-                    <p className="text-gray-500 mt-3 text-lg">{description}</p>
-                </div>
+        <div className="min-h-screen flex justify-center items-center bg-white">
+        <div className="w-full max-w-3xl bg-white p-6 md:p-8 rounded-lg shadow-lg">
+        {/* Encabezado */}
+        <div className="text-center">
+            <h1 className="text-2xl md:text-3xl font-bold text-emerald-600">{title}</h1>
+            <p className="text-gray-600 mt-2 text-sm md:text-base">{description}</p>
+        </div>
 
-                {/* Campos del formulario */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {data.map((field, fieldIndex) => (
-                        <div key={fieldIndex} className="flex flex-col">
-                            {/* Renderizado dinámico de campos */}
-                            {field.type === "select" && (
-                                <Dropdown
-                                    label={field.label}
-                                    options={field.options}
-                                    onSelect={(value) =>
-                                        setFormData((prev) => ({
-                                            ...prev,
-                                            [field.name]: value,
-                                        }))
-                                    }
-                                />
-                            )}
-                            {(field.type === "text" ||
-                                field.type === "password" ||
-                                field.type === "number") && (
-                                <TextField
-                                    label={field.label}
-                                    name={field.name}
-                                    type={field.type}
-                                    placeholder={field.placeholder}
-                                    value={formData[field.name] || ""}
-                                    onChange={(e) => handleChange(e, field.name)}
-                                />
-                            )}
-                            {field.type === "textarea" && (
-                                <TextArea
-                                    label={field.label}
-                                    name={field.name}
-                                    placeholder={field.placeholder}
-                                    value={formData[field.name] || ""}
-                                    onChange={(e) => handleChange(e, field.name)}
-                                />
-                            )}
-                            {field.type === "checkbox" && (
-                                <Checkbox
-                                    label={field.label}
-                                    name={field.name}
-                                    checked={formData[field.name] || false}
-                                    onChange={(e) => handleChange(e, field.name)}
-                                />
-                            )}
-                        </div>
-                    ))}
-                </div>
-
-                {/* Botón de enviar */}
-                <div className="flex justify-end">
-                    <button
-                        type="submit"
-                        className="bg-emerald-600 text-white font-medium text-sm md:text-base px-6 py-3 rounded-full hover:bg-emerald-700 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all duration-300"
+        {/* Formulario */}
+        <form
+            onSubmit={handleFormSubmit}
+            className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4"
+        >
+            {data.map((field, index) => (
+                <div key={index} className="flex flex-col">
+                    <label
+                        htmlFor={field.name}
+                        className="text-sm md:text-base font-medium text-gray-700 mb-1"
                     >
-                        {titleBtn}
-                    </button>
+                        {field.label}
+                    </label>
+                    <input
+                        type={field.type}
+                        id={field.name}
+                        name={field.name}
+                        placeholder={field.placeholder}
+                        value={formData[field.name] || ""}
+                        onChange={(e) => handleChange(e, field.name)}
+                        className="border rounded-md px-4 py-2 focus:ring-emerald-500 focus:border-emerald-500 text-sm md:text-base"
+                    />
                 </div>
-            </form>
+            ))}
 
-            {/* Snackbar */}
-            {snackbar.message && (
-                <Snackbar
-                    message={snackbar.message}
-                    type={snackbar.type}
-                    duration={3000}
-                    onClose={() => setSnackbar({ message: "", type: "" })}
-                />
-            )}
-        </>
+            {/* Botón de enviar */}
+            <div className="col-span-1 md:col-span-2 flex justify-end">
+                <button
+                    type="submit"
+                    className="bg-emerald-600 text-white px-6 py-3 rounded-md font-medium hover:bg-emerald-700 transition duration-300 text-sm md:text-base"
+                >
+                    {titleBtn}
+                </button>
+            </div>
+        </form>
+
+        {/* Snackbar */}
+        {snackbar.message && (
+            <div
+                className={`mt-4 px-4 py-2 rounded-md text-white text-center ${
+                    snackbar.type === "success"
+                        ? "bg-emerald-600"
+                        : "bg-red-600"
+                }`}
+            >
+                {snackbar.message}
+            </div>
+        )}
+    </div>
+</div>
+
     );
 };
 
