@@ -1,7 +1,7 @@
-import React from "react";
+import React, { forwardRef } from "react";
 import { GoogleMaps } from "./MiscDesings";
 
-const MapWithInputs = ({ value = { lat: "", lng: "" }, onChange }) => {
+const MapWithInputs = forwardRef(({ value = { lat: "", lng: "" }, onChange }, ref) => {
     const handleMapClick = (event) => {
         const lat = event.latLng.lat();
         const lng = event.latLng.lng();
@@ -23,7 +23,7 @@ const MapWithInputs = ({ value = { lat: "", lng: "" }, onChange }) => {
     };
 
     return (
-        <div>
+        <div ref={ref}>
             <GoogleMaps markers={[value]} onMapClick={handleMapClick} />
             <div className="flex flex-col space-y-4 mt-4">
                 <label className="text-sm font-medium text-gray-800">Latitud:</label>
@@ -56,6 +56,6 @@ const MapWithInputs = ({ value = { lat: "", lng: "" }, onChange }) => {
             </div>
         </div>
     );
-};
+});
 
 export default MapWithInputs;
