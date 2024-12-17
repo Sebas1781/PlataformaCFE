@@ -109,10 +109,10 @@ export const reportFields = [
 //TODO aki ponen sus formularios
 
 export const userFields = [
-    { label: 'Número de Trabajador', name: 'numeroTrabajador', type: 'text', required: true },
-    { label: 'Nombre', name: 'nombre', type: 'text', required: true },
-    { label: 'Contraseña', name: 'password', type: 'password', required: true },
-    { label: 'Confirmar Contraseña', name: 'confirmPassword', type: 'password', required: true },
+    { name: "numeroTrabajador", label: "Número de Trabajador", type: "text", placeholder: "Ingrese el número",},
+    { name: "nombre", label: "Nombre", type: "text", placeholder: "Ingrese el nombre",},
+    { name: "password", label: "Contraseña", type: "password", placeholder: "Ingrese la contraseña",},
+    { name: "confirmPassword", label: "Confirmar Contraseña", type: "password", placeholder: "Confirme la contraseña",},
 ];
 
 export const passwordFields = [
