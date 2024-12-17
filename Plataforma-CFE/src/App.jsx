@@ -68,8 +68,8 @@ function App() {
                         {/* Rutas restringidas a administradores */}
                         {userType === "1" && (
                             <>
-                                <Route path="/nuevo/usuario" element={<PrivateRoute><AddUser /></PrivateRoute>} />
-                                <Route path="/editar/usuario/:id" element={<PrivateRoute><EditUser /></PrivateRoute>} />
+                                <Route path="/nuevo/usuario" element={<PrivateRoute><AddUser/></PrivateRoute>} />
+                                <Route path="/editar/usuario/:id" element={<PrivateRoute><EditUser/></PrivateRoute>} />
                             </>
                         )}
                     </Routes>
