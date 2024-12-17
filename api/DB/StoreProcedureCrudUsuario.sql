@@ -13,7 +13,7 @@ BEGIN
 	INSERT INTO Usuarios(numeroTrabajador, nombre, password, tipoUsuario)
 	VALUES (@numeroTrabajador, @nombre, @password, @tipoUsuario);
 END;
-
+GO
 --Eliminar usuario por ID
 CREATE PROCEDURE DeleteUser
 	@idTrabajador INT
@@ -23,6 +23,7 @@ BEGIN
 	DELETE FROM Usuarios
 	WHERE idTrabajador = @idTrabajador;
 END;
+GO
 
 -- Actualizar datos del Usuario
 CREATE PROCEDURE UserUpdate 
@@ -40,6 +41,7 @@ BEGIN
         tipoUsuario = @tipoUsuario
     WHERE idTrabajador = @IdTrabajador;
 END;
+GO
 
 -- Buscar usuario por ID
 CREATE PROCEDURE GetUserById
@@ -51,7 +53,7 @@ BEGIN
 	FROM Usuarios
 	WHERE idTrabajador = @idTrabajador
 END;
-
+GO
 /*-----------------------------------------------------
     Login
 -------------------------------------------------------*/
@@ -70,7 +72,7 @@ BEGIN
     FROM Usuarios
     WHERE numeroTrabajador = @p_numeroTrabajador;
 END;
-
+GO
 /*-----------------------------------------------------
     Obtener datos
 -------------------------------------------------------*/
@@ -84,10 +86,10 @@ BEGIN
         idTrabajador,
         numeroTrabajador,
         nombre,
-        tipoUsuario,
+        tipoUsuario
     FROM Usuarios;
 END;
-
+GO
 /*-----------------------------------------------------
     Reportes crear reporte
 -------------------------------------------------------*/
