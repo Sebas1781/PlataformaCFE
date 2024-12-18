@@ -32,27 +32,36 @@ export const GeneraFormularioReporte = ({
   };
 
   // Manejador de cambios
-  const handleChange = (e, fieldName) => {
-    const { type, checked, value } = e.target;
-    setFormData((prev) => {
-      const updatedData = {
-        ...prev,
-        [fieldName]: type === "checkbox" ? (checked ? 1 : 0) : value,
-      };
+// Dentro de handleChange (GlobalForms.jsx)
+const handleChange = (e, fieldName) => {
+  const { type, checked, value } = e.target;
+  setFormData((prev) => {
+    const updatedData = {
+      ...prev,
+      [fieldName]: type === "checkbox" ? (checked ? 1 : 0) : value,
+    };
 
-      // VSWR dinámico
-      if (["potenciaIncidente", "potenciaReflejada"].includes(fieldName)) {
-        const incidentPower = parseFloat(updatedData.potenciaIncidente) || 0;
-        const reflectedPower = parseFloat(updatedData.potenciaReflejada) || 0;
-        updatedData.vswr = calculateVSWR(incidentPower, reflectedPower);
-      }
-      return updatedData;
-    });
-
-    if (errors[fieldName]) {
-      setErrors((prev) => ({ ...prev, [fieldName]: false }));
+    // VSWR dinámico
+    if (["potenciaIncidente", "potenciaReflejada"].includes(fieldName)) {
+      const incidentPower = parseFloat(updatedData.potenciaIncidente) || 0;
+      const reflectedPower = parseFloat(updatedData.potenciaReflejada) || 0;
+      updatedData.vswr = calculateVSWR(incidentPower, reflectedPower);
     }
-  };
+
+    // Actualizar nombreReporte si cambian direccion, fecha o responsable
+    if (["direccion", "fecha", "responsable"].includes(fieldName)) {
+      const { direccion = "", fecha = "", responsable = "" } = updatedData;
+      updatedData.nombreReporte = `${direccion}-${fecha}-${responsable}`;
+    }
+
+    return updatedData;
+  });
+
+  if (errors[fieldName]) {
+    setErrors((prev) => ({ ...prev, [fieldName]: false }));
+  }
+};
+
 
   // Validación de la sección actual
   const validateCurrentSection = () => {

@@ -3,6 +3,7 @@ import { reportFields } from "../../data/formConfig";
 
 const NewReport = () => {
   const initValues = {
+    nombreReporte: "",
     tipoMantenimiento: "",
     modelo: "",
     fecha: "",
