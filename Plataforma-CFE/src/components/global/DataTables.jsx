@@ -9,6 +9,7 @@ export const GenerarTabla = ({ header = [], title = "", description = "", data =
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
+  // Filtra la data según el término de búsqueda
   const filteredData = data.filter((row) =>
     Object.values(row).some((value) =>
       value.toString().toLowerCase().includes(searchTerm.toLowerCase())
@@ -21,6 +22,7 @@ export const GenerarTabla = ({ header = [], title = "", description = "", data =
 
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
+  // Handlers
   const handleEdit = (id) => console.log(`Editando reporte con ID: ${id}`);
   const handleDelete = (id) => console.log(`Eliminando reporte con ID: ${id}`);
   const handlePrint = (id) => navigate(`/imprimir/${id}`);
@@ -31,7 +33,8 @@ export const GenerarTabla = ({ header = [], title = "", description = "", data =
       <p className="text-gray-700 mb-4">{description}</p>
 
       {/* Buscador y Filtro */}
-      <div className="mb-4 flex justify-between items-center">
+      <div className="mb-4 flex flex-col md:flex-row md:justify-between md:items-center gap-2">
+        {/* Buscador */}
         <div className="flex items-center bg-white border border-gray-300 rounded-lg shadow-sm px-2">
           <FaSearch className="text-gray-500 mr-2" />
           <input
@@ -42,7 +45,9 @@ export const GenerarTabla = ({ header = [], title = "", description = "", data =
             className="w-full px-2 py-2 text-base font-semibold focus:outline-none"
           />
         </div>
-        <div className="flex items-center space-x-2">
+
+        {/* Filtro */}
+        <div className="flex items-center">
           <select
             id="filter"
             value={filterOption}
@@ -65,7 +70,10 @@ export const GenerarTabla = ({ header = [], title = "", description = "", data =
             <thead className="bg-emerald-600 text-white">
               <tr>
                 {header.map((col) => (
-                  <th key={col.id} className="px-6 py-3 text-left text-sm font-medium">
+                  <th
+                    key={col.id}
+                    className="px-6 py-3 text-left text-sm font-medium"
+                  >
                     {col.label}
                   </th>
                 ))}
@@ -73,16 +81,36 @@ export const GenerarTabla = ({ header = [], title = "", description = "", data =
             </thead>
             <tbody>
               {currentItems.map((row, rowIndex) => (
-                <tr key={row.id} className={rowIndex % 2 === 0 ? "bg-gray-50" : "bg-white"}>
+                <tr
+                  key={row.id}
+                  className={rowIndex % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                >
                   {header.map((col) => (
                     <td key={col.id} className="px-6 py-4 text-sm">
                       {col.id === "actions" ? (
                         <div className="flex space-x-2">
-                          <button onClick={() => handleEdit(row.id)} className="text-blue-500 hover:text-blue-700"><FaEdit /></button>
-                          <button onClick={() => handleDelete(row.id)} className="text-red-500 hover:text-red-700"><FaTrash /></button>
-                          <button onClick={() => handlePrint(row.id)} className="text-green-500 hover:text-green-700"><FaPrint /></button>
+                          <button
+                            onClick={() => handleEdit(row.id)}
+                            className="text-blue-500 hover:text-blue-700"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(row.id)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            <FaTrash />
+                          </button>
+                          <button
+                            onClick={() => handlePrint(row.id)}
+                            className="text-green-500 hover:text-green-700"
+                          >
+                            <FaPrint />
+                          </button>
                         </div>
-                      ) : row[col.id]}
+                      ) : (
+                        row[col.id]
+                      )}
                     </td>
                   ))}
                 </tr>
@@ -95,18 +123,58 @@ export const GenerarTabla = ({ header = [], title = "", description = "", data =
       {/* Vista de fichas en móvil */}
       <div className="block md:hidden">
         {currentItems.map((row) => (
-          <div key={row.id} className="bg-white rounded-lg shadow-md mb-4 p-4 border border-gray-200">
-            {header.map((col) => (
-              <div key={col.id} className="mb-2">
-                <span className="font-semibold text-emerald-600">{col.label}:</span>
-                <p className="text-gray-700">{row[col.id]}</p>
-              </div>
-            ))}
-            {/* Botones de acción */}
-            <div className="flex space-x-4 mt-2">
-              <button onClick={() => handleEdit(row.id)} className="text-blue-500 hover:text-blue-700"><FaEdit /></button>
-              <button onClick={() => handleDelete(row.id)} className="text-red-500 hover:text-red-700"><FaTrash /></button>
-              <button onClick={() => handlePrint(row.id)} className="text-green-500 hover:text-green-700"><FaPrint /></button>
+          <div
+            key={row.id}
+            className="bg-white rounded-lg shadow-md mb-4 p-4 border border-gray-200"
+          >
+            <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+              {header.map((col) => {
+                if (col.id === "actions") {
+                  // Para la fila de Acciones: label izquierda, íconos centrados a la derecha
+                  return (
+                    <React.Fragment key={col.id}>
+                      {/* Columna izquierda: label "Acciones" y subtítulo */}
+                      <div>
+                        <span className="font-semibold text-emerald-600">
+                          {col.label}:
+                        </span>
+                        <p className="text-gray-700">Editar</p>
+                      </div>
+                      {/* Columna derecha: iconos centrados (tamaño normal) */}
+                      <div className="flex justify-center items-center space-x-4">
+                        <button
+                          onClick={() => handleEdit(row.id)}
+                          className="text-blue-500 hover:text-blue-700"
+                        >
+                          <FaEdit />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(row.id)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <FaTrash />
+                        </button>
+                        <button
+                          onClick={() => handlePrint(row.id)}
+                          className="text-green-500 hover:text-green-700"
+                        >
+                          <FaPrint />
+                        </button>
+                      </div>
+                    </React.Fragment>
+                  );
+                } else {
+                  // Resto de columnas (Nombre, Elaborado por, etc.)
+                  return (
+                    <div key={col.id}>
+                      <span className="font-semibold text-emerald-600">
+                        {col.label}:
+                      </span>
+                      <p className="text-gray-700">{row[col.id]}</p>
+                    </div>
+                  );
+                }
+              })}
             </div>
           </div>
         ))}
@@ -120,7 +188,9 @@ export const GenerarTabla = ({ header = [], title = "", description = "", data =
               key={index + 1}
               onClick={() => setCurrentPage(index + 1)}
               className={`px-4 py-2 rounded ${
-                currentPage === index + 1 ? "bg-emerald-600 text-white" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                currentPage === index + 1
+                  ? "bg-emerald-600 text-white"
+                  : "bg-gray-200 text-gray-700 hover:bg-gray-300"
               }`}
             >
               {index + 1}
@@ -132,7 +202,13 @@ export const GenerarTabla = ({ header = [], title = "", description = "", data =
   );
 };
 
-export const UsersTable = ({ header = [], title = "", description = "", titleBtn = "", data = [] }) => {
+export const UsersTable = ({
+  header = [],
+  title = "",
+  description = "",
+  titleBtn = "",
+  data = [],
+}) => {
   const navigate = useNavigate();
 
   const handleEdit = (id) => {
@@ -229,7 +305,9 @@ export const UsersTable = ({ header = [], title = "", description = "", titleBtn
               >
                 {header.map((col) => (
                   <div key={col.id} className="flex justify-between">
-                    <span className="font-medium text-gray-600">{col.label}:</span>
+                    <span className="font-medium text-gray-600">
+                      {col.label}:
+                    </span>
                     <span className="text-gray-700">
                       {col.id === "actions" ? (
                         <div className="flex space-x-2">
@@ -257,7 +335,9 @@ export const UsersTable = ({ header = [], title = "", description = "", titleBtn
               </div>
             ))
           ) : (
-            <div className="p-4 text-center text-gray-500">No hay datos disponibles</div>
+            <div className="p-4 text-center text-gray-500">
+              No hay datos disponibles
+            </div>
           )}
         </div>
       </div>
