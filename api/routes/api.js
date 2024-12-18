@@ -13,39 +13,37 @@ api.get('/health-check', (req, res) => {
 });
 
 api.post('/agregarReporte', async (req, res) => {
-  const procedureName = 'InsertReporte';
+  // Nombre del nuevo SP que inserta en todas las tablas
+  const procedureName = 'sp_insertar_reporte';
 
+  // Extraer los campos desde req.body
   const {
-    nombreReporte,
-    fechaCreacion,
-    ultimaModificacion,
     tipoMantenimiento,
-    ModeloID,
-    responsable,
+    modelo,
+    fecha,
     horaInicio,
     horaTermino,
+    responsable,
     licencia,
     registro,
     restaurador,
-    CircuitoID,
+    circuito,
     area,
-    latitud,
-    longitud,
+    ubicacionMapa, // Este debería llegar como objeto { lat: X, lng: Y }
     direccion,
     nsRadioGabinete,
     potenciaSalida,
-    rss1,
+    rssi,
     umbralRecepcion,
-    frecuenciaID,
+    frecuencia,
     rx,
     tx,
-    CablePigtailID,
-    SupresorID,
-    CableLTID,
-    AntenaID,
+    cablePigtail,
+    supresor,
+    cableLT,
     alturaAntena,
-    RepetidorEnlaceID,
-    CanalUCMID,
+    repetidorEnlace,
+    canalUCM,
     fotografiasMantto,
     medicionRF,
     medicionFuenteCD,
@@ -68,14 +66,14 @@ api.post('/agregarReporte', async (req, res) => {
     resistenciaTierra,
     voltajeFuente,
     voltajeBateria,
-    resitenciaBateria,
+    resistenciaBateria,
     porcentajeBateria,
     anguloAzimut,
-    placaNomeclatura,
+    placaNomenclatura,
     selladoGabinete,
     protectorAntifauna,
-    cuchillaByPass,
-    cuchillaLaterale,
+    cuchillasByPass,
+    cuchillasLaterale,
     bajanteTierra,
     terminalPAT,
     apartarrayos,
@@ -97,36 +95,37 @@ api.post('/agregarReporte', async (req, res) => {
   try {
     const request = SysConn.request();
     
-    request.input('nombreReporte', mssql.NVarChar, nombreReporte);
-    request.input('fechaCreacion', mssql.Date, fechaCreacion);
-    request.input('ultimaModificacion', mssql.Date, ultimaModificacion);
-    request.input('tipoMantenimiento', mssql.NVarChar, tipoMantenimiento);
-    request.input('ModeloID', mssql.Int, ModeloID);
-    request.input('responsable', mssql.Int, responsable);
-    request.input('horaInicio', mssql.NVarChar, horaInicio);
-    request.input('horaTermino', mssql.NVarChar, horaTermino);
-    request.input('licencia', mssql.NVarChar, licencia);
-    request.input('registro', mssql.NVarChar, registro);
-    request.input('restaurador', mssql.NVarChar, restaurador);
-    request.input('CircuitoID', mssql.Int, CircuitoID);
-    request.input('area', mssql.NVarChar, area);
-    request.input('latitud', mssql.NVarChar, latitud);
-    request.input('longitud', mssql.NVarChar, longitud);
-    request.input('direccion', mssql.NVarChar, direccion);
-    request.input('nsRadioGabinete', mssql.NVarChar, nsRadioGabinete);
-    request.input('potenciaSalida', mssql.NVarChar, potenciaSalida);
-    request.input('rss1', mssql.NVarChar, rss1);
-    request.input('umbralRecepcion', mssql.NVarChar, umbralRecepcion);
-    request.input('frecuenciaID', mssql.Int, frecuenciaID);
-    request.input('rx', mssql.NVarChar, rx);
-    request.input('tx', mssql.NVarChar, tx);
-    request.input('CablePigtailID', mssql.Int, CablePigtailID);
-    request.input('SupresorID', mssql.Int, SupresorID);
-    request.input('CableLTID', mssql.Int, CableLTID);
-    request.input('AntenaID', mssql.Int, AntenaID);
-    request.input('alturaAntena', mssql.VarChar, alturaAntena);
-    request.input('RepetidorEnlaceID', mssql.Int, RepetidorEnlaceID);
-    request.input('CanalUCMID', mssql.Int, CanalUCMID);
+    // Asignar parámetros. Ajusta los tipos NVarchar( ... ), Date, etc. de acuerdo a tu SP.
+    // Supongamos que usas los mismos tipos que definimos en el SP previo.
+    request.input('tipoMantenimiento', mssql.NVarChar(50), tipoMantenimiento);
+    request.input('modelo', mssql.NVarChar(100), modelo);
+    request.input('fecha', mssql.Date, fecha);
+    request.input('horaInicio', mssql.NVarChar(20), horaInicio);
+    request.input('horaTermino', mssql.NVarChar(20), horaTermino);
+    request.input('responsable', mssql.NVarChar(100), responsable);
+    request.input('licencia', mssql.NVarChar(20), licencia);
+    request.input('registro', mssql.NVarChar(20), registro);
+    request.input('restaurador', mssql.NVarChar(20), restaurador);
+    request.input('circuito', mssql.NVarChar(100), circuito);
+    request.input('area', mssql.NVarChar(100), area);
+    // Convertir ubicacionMapa a string JSON antes de enviarla
+    request.input('ubicacionMapa', mssql.NVarChar(150), JSON.stringify(ubicacionMapa));
+    request.input('direccion', mssql.NVarChar(150), direccion);
+    request.input('nsRadioGabinete', mssql.NVarChar(100), nsRadioGabinete);
+    request.input('potenciaSalida', mssql.NVarChar(100), potenciaSalida);
+    request.input('rssi', mssql.NVarChar(10), String(rssi));
+    request.input('umbralRecepcion', mssql.NVarChar(10), String(umbralRecepcion));
+    request.input('frecuencia', mssql.NVarChar(100), frecuencia);
+    request.input('rx', mssql.NVarChar(50), rx);
+    request.input('tx', mssql.NVarChar(50), tx);
+    request.input('CablePigtail', mssql.NVarChar(100), cablePigtail);
+    request.input('Supresor', mssql.NVarChar(100), supresor);
+    request.input('CableLT', mssql.NVarChar(100), cableLT);
+    // En el SP Antena es NVarChar(100), si no tienes antena envía cadena vacía o el valor correspondiente
+    request.input('Antena', mssql.NVarChar(100), ''); // si no la utilizas
+    request.input('alturaAntena', mssql.NVarChar(50), alturaAntena);
+    request.input('RepetidorEnlace', mssql.NVarChar(100), repetidorEnlace);
+    request.input('CanalUCM', mssql.NVarChar(100), canalUCM);
     request.input('fotografiasMantto', mssql.Bit, fotografiasMantto);
     request.input('medicionRF', mssql.Bit, medicionRF);
     request.input('medicionFuenteCD', mssql.Bit, medicionFuenteCD);
@@ -141,47 +140,51 @@ api.post('/agregarReporte', async (req, res) => {
     request.input('cambioRadio', mssql.Bit, cambioRadio);
     request.input('cambioPigtail', mssql.Bit, cambioPigtail);
     request.input('cambioConectores', mssql.Bit, cambioConectores);
-    request.input('potenciaRadio', mssql.NVarChar, potenciaRadio);
-    request.input('potenciaIncidente', mssql.NVarChar, potenciaIncidente);
-    request.input('potenciaReflejada', mssql.NVarChar, potenciaReflejada);
-    request.input('vswr', mssql.VarChar, vswr);
-    request.input('voltajeAcometida', mssql.NVarChar, voltajeAcometida);
-    request.input('resistenciaTierra', mssql.NVarChar, resistenciaTierra);
-    request.input('voltajeFuente', mssql.NVarChar, voltajeFuente);
-    request.input('voltajeBateria', mssql.NVarChar, voltajeBateria);
-    request.input('resitenciaBateria', mssql.NVarChar, resitenciaBateria);
-    request.input('porcentajeBateria', mssql.NVarChar, porcentajeBateria);
-    request.input('anguloAzimut', mssql.NVarChar, anguloAzimut);
-    request.input('placaNomeclatura', mssql.Bit, placaNomeclatura);
+    request.input('potenciaRadio', mssql.NVarChar(50), potenciaRadio);
+    request.input('potenciaIncidente', mssql.NVarChar(50), potenciaIncidente);
+    request.input('potenciaReflejada', mssql.NVarChar(50), potenciaReflejada);
+    request.input('vswr', mssql.NVarChar(50), vswr);
+    request.input('voltajeAcometida', mssql.NVarChar(50), voltajeAcometida);
+    request.input('resistenciaTierra', mssql.NVarChar(50), resistenciaTierra);
+    request.input('voltajeFuente', mssql.NVarChar(50), voltajeFuente);
+    request.input('voltajeBateria', mssql.NVarChar(50), voltajeBateria);
+    request.input('resitenciaBateria', mssql.NVarChar(50), resistenciaBateria);
+    request.input('porcentajeBateria', mssql.NVarChar(50), porcentajeBateria);
+    request.input('anguloAzimut', mssql.NVarChar(50), anguloAzimut);
+    request.input('placaNomeclatura', mssql.Bit, placaNomenclatura);
     request.input('selladoGabinete', mssql.Bit, selladoGabinete);
     request.input('protectorAntifauna', mssql.Bit, protectorAntifauna);
-    request.input('cuchillaByPass', mssql.Bit, cuchillaByPass);
-    request.input('cuchillaLaterale', mssql.Bit, cuchillaLaterale);
+    request.input('cuchillaByPass', mssql.Bit, cuchillasByPass);
+    request.input('cuchillaLaterale', mssql.Bit, cuchillasLaterale);
     request.input('bajanteTierra', mssql.Bit, bajanteTierra);
     request.input('terminalPAT', mssql.Bit, terminalPAT);
     request.input('apartarrayos', mssql.Bit, apartarrayos);
     request.input('cableRF', mssql.Bit, cableRF);
-    request.input('calibreBajante', mssql.NVarChar, calibreBajante);
-    request.input('Observaciones', mssql.NVarChar, Observaciones);
-    request.input('configuracionRadio', mssql.NVarChar, configuracionRadio);
-    request.input('imagenEstructura', mssql.NVarChar, imagenEstructura);
-    request.input('imagenGabinete', mssql.NVarChar, imagenGabinete);
-    request.input('imagenRadio', mssql.NVarChar, imagenRadio);
-    request.input('imagenSupresor', mssql.NVarChar, imagenSupresor);
-    request.input('imagenRestaurador', mssql.NVarChar, imagenRestaurador);
-    request.input('imagenTerminalTierra', mssql.NVarChar, imagenTerminalTierra);
-    request.input('imagenBajanteTierra', mssql.NVarChar, imagenBajanteTierra);
-    request.input('imagenPlaca', mssql.NVarChar, imagenPlaca);
-    request.input('imagenAdicional', mssql.NVarChar, imagenAdicional);
+    request.input('calibreBajante', mssql.NVarChar(100), calibreBajante);
+    request.input('Observaciones', mssql.NVarChar(mssql.MAX), Observaciones);
+    request.input('configuracionRadio', mssql.NVarChar(mssql.MAX), configuracionRadio);
+    request.input('imagenEstructura', mssql.NVarChar(mssql.MAX), imagenEstructura);
+    request.input('imagenGabinete', mssql.NVarChar(mssql.MAX), imagenGabinete);
+    request.input('imagenRadio', mssql.NVarChar(mssql.MAX), imagenRadio);
+    request.input('imagenSupresor', mssql.NVarChar(mssql.MAX), imagenSupresor);
+    request.input('imagenRestaurador', mssql.NVarChar(mssql.MAX), imagenRestaurador);
+    request.input('imagenTerminalTierra', mssql.NVarChar(mssql.MAX), imagenTerminalTierra);
+    request.input('imagenBajanteTierra', mssql.NVarChar(mssql.MAX), imagenBajanteTierra);
+    request.input('imagenPlaca', mssql.NVarChar(mssql.MAX), imagenPlaca);
+    request.input('imagenAdicional', mssql.NVarChar(mssql.MAX), imagenAdicional);
 
     const results = await request.execute(procedureName);
 
-    res.json({ message: 'Reporte agregado exitosamente', results });
+    // De acuerdo a cómo definimos el SP, este retorna el id_reporte recién creado
+    const idReporte = results.recordset[0].id_reporte;
+
+    res.json({ message: 'Reporte agregado exitosamente', id_reporte: idReporte });
   } catch (error) {
     console.error('Error al ejecutar el Store Procedure:', error);
     res.status(500).json({ error: 'Error al ejecutar el Store Procedure' });
   }
 });
+
 
 /*-----------------------------------------------------
     End Points by Carlos

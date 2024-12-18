@@ -13,7 +13,7 @@ BEGIN
 	INSERT INTO Usuarios(numeroTrabajador, nombre, password, tipoUsuario)
 	VALUES (@numeroTrabajador, @nombre, @password, @tipoUsuario);
 END;
-
+GO
 --Eliminar usuario por ID
 CREATE PROCEDURE DeleteUser
 	@idTrabajador INT
@@ -23,6 +23,7 @@ BEGIN
 	DELETE FROM Usuarios
 	WHERE idTrabajador = @idTrabajador;
 END;
+GO
 
 -- Actualizar datos del Usuario
 CREATE PROCEDURE UserUpdate 
@@ -40,6 +41,7 @@ BEGIN
         tipoUsuario = @tipoUsuario
     WHERE idTrabajador = @IdTrabajador;
 END;
+GO
 
 -- Buscar usuario por ID
 CREATE PROCEDURE GetUserById
@@ -51,7 +53,7 @@ BEGIN
 	FROM Usuarios
 	WHERE idTrabajador = @idTrabajador
 END;
-
+GO
 /*-----------------------------------------------------
     Login
 -------------------------------------------------------*/
@@ -70,7 +72,7 @@ BEGIN
     FROM Usuarios
     WHERE numeroTrabajador = @p_numeroTrabajador;
 END;
-
+GO
 /*-----------------------------------------------------
     Obtener datos
 -------------------------------------------------------*/
@@ -84,45 +86,41 @@ BEGIN
         idTrabajador,
         numeroTrabajador,
         nombre,
-        tipoUsuario,
+        tipoUsuario
     FROM Usuarios;
 END;
-
+GO
 /*-----------------------------------------------------
-    Reportes
+    Reportes crear reporte
 -------------------------------------------------------*/
-
-CREATE PROCEDURE InsertReporte
-    @nombreReporte NVARCHAR(MAX),
-    @fechaCreacion DATE,
-    @ultimaModificacion DATE,
-    @tipoMantenimiento NVARCHAR(MAX),
-    @ModeloID INT,
-    @responsable INT,
-    @horaInicio NVARCHAR(MAX),
-    @horaTermino NVARCHAR(MAX),
-    @licencia NVARCHAR(MAX),
-    @registro NVARCHAR(MAX),
-    @restaurador NVARCHAR(MAX),
-    @CircuitoID INT,
-    @area NVARCHAR(MAX),
-    @latitud NVARCHAR(MAX),
-    @longitud NVARCHAR(MAX),
-    @direccion NVARCHAR(MAX),
-    @nsRadioGabinete NVARCHAR(MAX),
-    @potenciaSalida NVARCHAR(MAX),
-    @rss1 NVARCHAR(MAX),
-    @umbralRecepcion NVARCHAR(MAX),
-    @frecuenciaID INT,
-    @rx NVARCHAR(MAX),
-    @tx NVARCHAR(MAX),
-    @CablePigtailID INT,
-    @SupresorID INT,
-    @CableLTID INT,
-    @AntenaID INT,
-    @alturaAntena NVARCHAR(MAX),
-    @RepetidorEnlaceID INT,
-    @CanalUCMID INT,
+CREATE PROCEDURE sp_insertar_reporte
+    @tipoMantenimiento NVARCHAR(50),
+    @modelo NVARCHAR(100),
+    @fecha DATE,
+    @horaInicio NVARCHAR(20),
+    @horaTermino NVARCHAR(20),
+    @responsable NVARCHAR(100),
+    @licencia NVARCHAR(20),
+    @registro NVARCHAR(20),
+    @restaurador NVARCHAR(20),
+    @circuito NVARCHAR(100),
+    @area NVARCHAR(100),
+    @ubicacionMapa NVARCHAR(150),
+    @direccion NVARCHAR(150),
+    @nsRadioGabinete NVARCHAR(100),
+    @potenciaSalida NVARCHAR(100),
+    @rssi NVARCHAR(10),
+    @umbralRecepcion NVARCHAR(10),
+    @frecuencia NVARCHAR(100),
+    @rx NVARCHAR(50),
+    @tx NVARCHAR(50),
+    @CablePigtail NVARCHAR(100),
+    @Supresor NVARCHAR(100),
+    @CableLT NVARCHAR(100),
+    @Antena NVARCHAR(100),
+    @alturaAntena NVARCHAR(50),
+    @RepetidorEnlace NVARCHAR(100),
+    @CanalUCM NVARCHAR(100),
     @fotografiasMantto BIT,
     @medicionRF BIT,
     @medicionFuenteCD BIT,
@@ -137,17 +135,17 @@ CREATE PROCEDURE InsertReporte
     @cambioRadio BIT,
     @cambioPigtail BIT,
     @cambioConectores BIT,
-    @potenciaRadio NVARCHAR(MAX),
-    @potenciaIncidente NVARCHAR(MAX),
-    @potenciaReflejada NVARCHAR(MAX),
-    @vswr NVARCHAR(MAX),
-    @voltajeAcometida NVARCHAR(MAX),
-    @resistenciaTierra NVARCHAR(MAX),
-    @voltajeFuente NVARCHAR(MAX),
-    @voltajeBateria NVARCHAR(MAX),
-    @resitenciaBateria NVARCHAR(MAX),
-    @porcentajeBateria NVARCHAR(MAX),
-    @anguloAzimut NVARCHAR(MAX),
+    @potenciaRadio NVARCHAR(50),
+    @potenciaIncidente NVARCHAR(50),
+    @potenciaReflejada NVARCHAR(50),
+    @vswr NVARCHAR(50),
+    @voltajeAcometida NVARCHAR(50),
+    @resistenciaTierra NVARCHAR(50),
+    @voltajeFuente NVARCHAR(50),
+    @voltajeBateria NVARCHAR(50),
+    @resitenciaBateria NVARCHAR(50),
+    @porcentajeBateria NVARCHAR(50),
+    @anguloAzimut NVARCHAR(50),
     @placaNomeclatura BIT,
     @selladoGabinete BIT,
     @protectorAntifauna BIT,
@@ -157,7 +155,7 @@ CREATE PROCEDURE InsertReporte
     @terminalPAT BIT,
     @apartarrayos BIT,
     @cableRF BIT,
-    @calibreBajante NVARCHAR(MAX),
+    @calibreBajante NVARCHAR(100),
     @Observaciones NVARCHAR(MAX),
     @configuracionRadio NVARCHAR(MAX),
     @imagenEstructura NVARCHAR(MAX),
@@ -172,165 +170,93 @@ CREATE PROCEDURE InsertReporte
 AS
 BEGIN
     SET NOCOUNT ON;
+    BEGIN TRY
+        BEGIN TRANSACTION;
 
-    -- Insertar el reporte en la tabla correspondiente
-    INSERT INTO Reportes (
-        nombreReporte,
-        fechaCreacion,
-        ultimaModificacion,
-        tipoMantenimiento,
-        ModeloID,
-        responsable,
-        horaInicio,
-        horaTermino,
-        licencia,
-        registro,
-        restaurador,
-        CircuitoID,
-        area,
-        ubicacionMapa,
-        direccion,
-        nsRadioGabinete,
-        potenciaSalida,
-        rss1,
-        umbralRecepcion,
-        frecuenciaID,
-        rx,
-        tx,
-        CablePigtailID,
-        SupresorID,
-        CableLTID,
-        AntenaID,
-        alturaAntena,
-        RepetidorEnlaceID,
-        CanalUCMID,
-        fotografiasMantto,
-        medicionRF,
-        medicionFuenteCD,
-        medicionBateria,
-        limpieza,
-        ajusteTornilleria,
-        cambioAntena,
-        impermeabilizacionConectores,
-        redireccionamientoAntena,
-        cambioLT,
-        cambioSupresor,
-        cambioRadio,
-        cambioPigtail,
-        cambioConectores,
-        potenciaRadio,
-        potenciaIncidente,
-        potenciaReflejada,
-        vswr,
-        voltajeAcometida,
-        resistenciaTierra,
-        voltajeFuente,
-        voltajeBateria,
-        resitenciaBateria,
-        porcentajeBateria,
-        anguloAzimut,
-        placaNomeclatura,
-        selladoGabinete,
-        protectorAntifauna,
-        cuchillaByPass,
-        cuchillaLaterale,
-        bajanteTierra,
-        terminalPAT,
-        apartarrayos,
-        cableRF,
-        calibreBajante,
-        Observaciones,
-        configuracionRadio,
-        imagenEstructura,
-        imagenGabinete,
-        imagenRadio,
-        imagenSupresor,
-        imagenRestaurador,
-        imagenTerminalTierra,
-        imagenBajanteTierra,
-        imagenPlaca,
-        imagenAdicional
-    ) VALUES (
-        @nombreReporte,
-        @fechaCreacion,
-        @ultimaModificacion,
-        @tipoMantenimiento,
-        @ModeloID,
-        @responsable,
-        @horaInicio,
-        @horaTermino,
-        @licencia,
-        @registro,
-        @restaurador,
-        @CircuitoID,
-        @area,
-        @latitud,
-        @longitud,
-        @direccion,
-        @nsRadioGabinete,
-        @potenciaSalida,
-        @rss1,
-        @umbralRecepcion,
-        @frecuenciaID,
-        @rx,
-        @tx,
-        @CablePigtailID,
-        @SupresorID,
-        @CableLTID,
-        @AntenaID,
-        @alturaAntena,
-        @RepetidorEnlaceID,
-        @CanalUCMID,
-        @fotografiasMantto,
-        @medicionRF,
-        @medicionFuenteCD,
-        @medicionBateria,
-        @limpieza,
-        @ajusteTornilleria,
-        @cambioAntena,
-        @impermeabilizacionConectores,
-        @redireccionamientoAntena,
-        @cambioLT,
-        @cambioSupresor,
-        @cambioRadio,
-        @cambioPigtail,
-        @cambioConectores,
-        @potenciaRadio,
-        @potenciaIncidente,
-        @potenciaReflejada,
-        @vswr,
-        @voltajeAcometida,
-        @resistenciaTierra,
-        @voltajeFuente,
-        @voltajeBateria,
-        @resitenciaBateria,
-        @porcentajeBateria,
-        @anguloAzimut,
-        @placaNomeclatura,
-        @selladoGabinete,
-        @protectorAntifauna,
-        @cuchillaByPass,
-        @cuchillaLaterale,
-        @bajanteTierra,
-        @terminalPAT,
-        @apartarrayos,
-        @cableRF,
-        @calibreBajante,
-        @Observaciones,
-        @configuracionRadio,
-        @imagenEstructura,
-        @imagenGabinete,
-        @imagenRadio,
-        @imagenSupresor,
-        @imagenRestaurador,
-        @imagenTerminalTierra,
-        @imagenBajanteTierra,
-        @imagenPlaca,
-        @imagenAdicional
-    );
+        -- Insert en la tabla principal
+        INSERT INTO ReportesInformacionBasica (
+            nombreReporte, fechaCreacion, ultimaModificacion,
+            tipoMantenimiento, Modelo, responsable, horaInicio, horaTermino,
+            licencia, registro, restaurador, Circuito, area, ubicacionMapa, direccion
+        )
+        VALUES (
+            'Reporte Automático', GETDATE(), GETDATE(),
+            @tipoMantenimiento, @modelo, @responsable, @horaInicio, @horaTermino,
+            @licencia, @registro, @restaurador, @circuito, @area, @ubicacionMapa, @direccion
+        );
 
-    -- Devuelve el ID del reporte insertado
-    SELECT SCOPE_IDENTITY() AS ReporteID;
-END;
+        DECLARE @new_id INT = SCOPE_IDENTITY();
+
+        -- Insert en ReportesSistemaComunicaciones
+        INSERT INTO ReportesSistemaComunicaciones (
+            id_reporte, nsRadioGabinete, potenciaSalida, rss1, umbralRecepcion, frecuencia,
+            rx, tx, CablePigtail, Supresor, CableLT, Antena
+        )
+        VALUES (
+            @new_id, @nsRadioGabinete, @potenciaSalida, @rssi, @umbralRecepcion, @frecuencia,
+            @rx, @tx, @CablePigtail, @Supresor, @CableLT, @Antena
+        );
+
+        -- Insert en ReportesMantenimiento
+        INSERT INTO ReportesMantenimiento (
+            id_reporte, alturaAntena, RepetidorEnlace, CanalUCM, fotografiasMantto,
+            medicionRF, medicionFuenteCD, medicionBateria, limpieza, ajusteTornilleria,
+            cambioAntena, impermeabilizacionConectores, redireccionamientoAntena, cambioLT, 
+            cambioSupresor, cambioRadio, cambioPigtail, cambioConectores
+        )
+        VALUES (
+            @new_id, @alturaAntena, @RepetidorEnlace, @CanalUCM, @fotografiasMantto,
+            @medicionRF, @medicionFuenteCD, @medicionBateria, @limpieza, @ajusteTornilleria,
+            @cambioAntena, @impermeabilizacionConectores, @redireccionamientoAntena, @cambioLT,
+            @cambioSupresor, @cambioRadio, @cambioPigtail, @cambioConectores
+        );
+
+        -- Insert en ReportesMediciones
+        INSERT INTO ReportesMediciones (
+            id_reporte, potenciaRadio, potenciaIncidente, potenciaReflejada,
+            vswr, voltajeAcometida, resistenciaTierra, voltajeFuente,
+            voltajeBateria, resitenciaBateria, porcentajeBateria, anguloAzimut
+        )
+        VALUES (
+            @new_id, @potenciaRadio, @potenciaIncidente, @potenciaReflejada,
+            @vswr, @voltajeAcometida, @resistenciaTierra, @voltajeFuente,
+            @voltajeBateria, @resitenciaBateria, @porcentajeBateria, @anguloAzimut
+        );
+
+        -- Insert en ReportesInstalacion
+        INSERT INTO ReportesInstalacion (
+            id_reporte, placaNomeclatura, selladoGabinete, protectorAntifauna,
+            cuchillaByPass, cuchillaLaterale, bajanteTierra, terminalPAT,
+            apartarrayos, cableRF, calibreBajante, Observaciones, configuracionRadio
+        )
+        VALUES (
+            @new_id, @placaNomeclatura, @selladoGabinete, @protectorAntifauna,
+            @cuchillaByPass, @cuchillaLaterale, @bajanteTierra, @terminalPAT,
+            @apartarrayos, @cableRF, @calibreBajante, @Observaciones, @configuracionRadio
+        );
+
+        -- Insert en ReportesImagenes
+        INSERT INTO ReportesImagenes (
+            id_reporte, imagenEstructura, imagenGabinete, imagenRadio, imagenSupresor,
+            imagenRestaurador, imagenTerminalTierra, imagenBajanteTierra, imagenPlaca, imagenAdicional
+        )
+        VALUES (
+            @new_id, @imagenEstructura, @imagenGabinete, @imagenRadio, @imagenSupresor,
+            @imagenRestaurador, @imagenTerminalTierra, @imagenBajanteTierra, @imagenPlaca, @imagenAdicional
+        );
+
+        COMMIT TRANSACTION;
+
+        SELECT @new_id AS id_reporte;
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        THROW; -- Re-lanza el error para que el cliente pueda capturarlo
+    END CATCH
+END
+GO
+
 
 
