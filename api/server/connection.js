@@ -1,7 +1,7 @@
+// server/connection.js
+
 const SysConfig = require('./config');
 const mssql = require('mssql');
-
-let SysConn;
 
 const config = {
   user: SysConfig.DbUserName,
@@ -9,34 +9,33 @@ const config = {
   server: SysConfig.ServerName,
   database: SysConfig.DbName,
   options: {
-    encrypt: true, 
+    encrypt: true, // Cambiar a false si no estás usando Azure
     enableArithAbort: true,
-    connectTimeout: 30000, 
-    requestTimeout: 30000, 
-    trustServerCertificate: true 
+    connectTimeout: 30000,
+    requestTimeout: 30000,
+    trustServerCertificate: true // Cambiar a false en producción si usas certificados válidos
   }
 };
 
-async function connectToDatabase() {
-  if (SysConn) {
-    try {
-      await SysConn.close();
-      console.log('Conexión previa a SQL Server cerrada correctamente.');
-    } catch (err) {
-      console.error('Error al cerrar la conexión previa:', err.message);
-    }
-  }
+// Crear una instancia de ConnectionPool
+const pool = new mssql.ConnectionPool(config);
 
-  try {
-    SysConn = await mssql.connect(config);
+// Conectar al pool y manejar el resultado
+const poolConnect = pool.connect()
+  .then(() => {
     console.log('Conexión exitosa a SQL Server');
-  } catch (err) {
+    return pool;
+  })
+  .catch(err => {
     console.error('Error al conectar a SQL Server:', err.message);
-  }
-}
+    process.exit(1); // Detener la aplicación si no se puede conectar
+  });
 
-connectToDatabase();
+// Manejar errores inesperados en el pool
+pool.on('error', err => {
+  console.error('Error inesperado en el pool de conexiones:', err);
+  process.exit(-1); // Detener la aplicación ante errores críticos
+});
 
-module.exports = {
-  request: () => SysConn.request()
-};
+// Exportar una promesa que resuelve el pool una vez conectado
+module.exports = poolConnect;

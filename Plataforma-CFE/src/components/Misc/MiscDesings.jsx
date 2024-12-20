@@ -1,4 +1,6 @@
-import React, { useState, forwardRef } from "react";
+// src/components/Misc/MiscDesigns.jsx
+
+import React, { useState, forwardRef, useRef, useEffect } from "react";
 import { GoogleMap, Marker } from "@react-google-maps/api";
 
 // TextField
@@ -61,14 +63,28 @@ export const Dropdown = forwardRef(
     ref
   ) => {
     const [isOpen, setIsOpen] = useState(false);
+    const dropdownRef = useRef(null);
 
     const handleOptionClick = (option) => {
       onSelect(option);
       setIsOpen(false);
     };
 
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    };
+
+    useEffect(() => {
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, []);
+
     return (
-      <div className="flex flex-col space-y-2">
+      <div className="flex flex-col space-y-2" ref={dropdownRef}>
         {label && (
           <label className="text-sm font-medium text-gray-700 hover:text-emerald-600">
             {label}
@@ -80,7 +96,7 @@ export const Dropdown = forwardRef(
             type="button"
             onClick={() => setIsOpen(!isOpen)}
             className={`w-full h-12 bg-white border text-gray-700 px-4 rounded-lg shadow-sm flex justify-between items-center 
-            focus:ring-2 focus:outline-none transition-all duration-300 ${className}`}
+            focus:ring-2 focus:outline-none transition-all duration-300 ${className} ${className.includes("border-red-500") ? "border-red-500" : ""}`}
           >
             <span className={`${!value ? "text-gray-400" : ""}`}>{value || placeholder}</span>
             <svg
@@ -94,7 +110,7 @@ export const Dropdown = forwardRef(
             </svg>
           </button>
           {isOpen && (
-            <div className="absolute z-50 mt-2 w-full rounded-lg shadow-lg bg-white border">
+            <div className="absolute z-50 mt-2 w-full rounded-lg shadow-lg bg-white border max-h-60 overflow-y-auto">
               <ul className="py-2 text-gray-700 text-sm">
                 {options.map((option, index) => (
                   <li
@@ -102,7 +118,7 @@ export const Dropdown = forwardRef(
                     onClick={() => handleOptionClick(option)}
                     className="px-4 py-2 cursor-pointer hover:bg-emerald-100 hover:text-emerald-600 transition-all duration-200"
                   >
-                    {option}
+                    {option.nombre || option}
                   </li>
                 ))}
               </ul>
@@ -114,7 +130,7 @@ export const Dropdown = forwardRef(
   }
 );
 
-// **Checkbox** con forwardRef para admitir refs:
+// Checkbox
 export const Checkbox = forwardRef(({ label, name, checked, onChange }, ref) => (
   <div className="flex items-center space-x-3">
     <input
@@ -195,11 +211,11 @@ export const Range = forwardRef(
 );
 
 // ImageInput
-export const ImageInput = forwardRef(({ label, name, onChange, className }, ref) => (
+export const ImageInput = forwardRef(({ label, name, onChange, className, error }, ref) => (
   <div className="flex flex-col space-y-2">
     {label && (
       <label htmlFor={name} className="text-sm font-medium text-gray-800">
-        {label}
+        {label} {error && <span className="text-red-500">*</span>}
       </label>
     )}
     <input
@@ -210,8 +226,10 @@ export const ImageInput = forwardRef(({ label, name, onChange, className }, ref)
       accept="image/*"
       onChange={onChange}
       className={`file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold 
-                 file:bg-emerald-100 file:text-emerald-600 hover:file:bg-emerald-200 ${className}`}
+                 file:bg-emerald-100 file:text-emerald-600 hover:file:bg-emerald-200 ${className} ${error ? "border-red-500" : ""
+        }`}
     />
+    {error && <p className="text-red-500 text-xs italic">{error}</p>}
   </div>
 ));
 

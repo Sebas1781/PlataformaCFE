@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from "react";
 import Snackbar from "../global/Snackbar";
 import { Dropdown, TextField, Checkbox, TextArea, Range, ImageInput } from "../Misc/MiscDesings";
@@ -5,6 +6,8 @@ import MapWithInputs from "../Misc/MapWithInputs";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
+
+// GeneraFormularioReporte Component
 export const GeneraFormularioReporte = ({
   data = [],
   initValues = {},
@@ -32,36 +35,70 @@ export const GeneraFormularioReporte = ({
   };
 
   // Manejador de cambios
-// Dentro de handleChange (GlobalForms.jsx)
-const handleChange = (e, fieldName) => {
-  const { type, checked, value } = e.target;
-  setFormData((prev) => {
-    const updatedData = {
+  const handleChange = (e, fieldName) => {
+    const { type, checked, value } = e.target;
+    setFormData((prev) => {
+      const updatedData = {
+        ...prev,
+        [fieldName]: type === "checkbox" ? (checked ? 1 : 0) : value,
+      };
+
+      // VSWR dinámico
+      if (["potenciaIncidente", "potenciaReflejada"].includes(fieldName)) {
+        const incidentPower = parseFloat(updatedData.potenciaIncidente) || 0;
+        const reflectedPower = parseFloat(updatedData.potenciaReflejada) || 0;
+        updatedData.vswr = calculateVSWR(incidentPower, reflectedPower);
+      }
+
+      // Actualizar nombreReporte si cambian direccion, fecha o responsable
+      if (["direccion", "fecha", "responsable"].includes(fieldName)) {
+        const { direccion = "", fecha = "", responsable = "" } = updatedData;
+        updatedData.nombreReporte = `${direccion}-${fecha}-${responsable}`;
+      }
+
+      return updatedData;
+    });
+
+    if (errors[fieldName]) {
+      setErrors((prev) => ({ ...prev, [fieldName]: false }));
+    }
+  };
+
+  // Manejo de cambios en el mapa
+  const handleMapChange = (location, fieldName) => {
+    setFormData((prev) => ({
       ...prev,
-      [fieldName]: type === "checkbox" ? (checked ? 1 : 0) : value,
-    };
+      [fieldName]: { lat: location.lat, lng: location.lng },
+    }));
+  };
 
-    // VSWR dinámico
-    if (["potenciaIncidente", "potenciaReflejada"].includes(fieldName)) {
-      const incidentPower = parseFloat(updatedData.potenciaIncidente) || 0;
-      const reflectedPower = parseFloat(updatedData.potenciaReflejada) || 0;
-      updatedData.vswr = calculateVSWR(incidentPower, reflectedPower);
+  // Manejo de cambios en archivos (imágenes)
+  const handleFileChange = (e, fieldName) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validar el tamaño del archivo (máximo 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setSnackbar({ message: "La imagen excede el tamaño máximo permitido de 5MB.", type: "error" });
+        // Resetear el campo de archivo
+        setFormData((prev) => ({ ...prev, [fieldName]: null }));
+        return;
+      }
+
+      // Validar el tipo de archivo
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
+      if (!allowedTypes.includes(file.type)) {
+        setSnackbar({ message: "Solo se permiten archivos de tipo JPEG, JPG, PNG y GIF.", type: "error" });
+        // Resetear el campo de archivo
+        setFormData((prev) => ({ ...prev, [fieldName]: null }));
+        return;
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        [fieldName]: file,
+      }));
     }
-
-    // Actualizar nombreReporte si cambian direccion, fecha o responsable
-    if (["direccion", "fecha", "responsable"].includes(fieldName)) {
-      const { direccion = "", fecha = "", responsable = "" } = updatedData;
-      updatedData.nombreReporte = `${direccion}-${fecha}-${responsable}`;
-    }
-
-    return updatedData;
-  });
-
-  if (errors[fieldName]) {
-    setErrors((prev) => ({ ...prev, [fieldName]: false }));
-  }
-};
-
+  };
 
   // Validación de la sección actual
   const validateCurrentSection = () => {
@@ -70,13 +107,19 @@ const handleChange = (e, fieldName) => {
 
     currentFields.forEach((field) => {
       const value = formData[field.name];
-      // Si es required y está vacío (excepto para 0 en checkboxes)
-      if (field.required && (!value && value !== 0)) {
-        newErrors[field.name] = true;
-      }
-      // Si es array y está vacío
-      if (field.required && Array.isArray(value) && value.length === 0) {
-        newErrors[field.name] = true;
+      // Validación general para campos requeridos
+      if (field.required) {
+        if (field.type === "image") {
+          if (!value) {
+            newErrors[field.name] = "Este campo es obligatorio.";
+          }
+        } else if (field.type === "map") {
+          if (!value || (value.lat === 0 && value.lng === 0)) {
+            newErrors[field.name] = "Este campo es obligatorio.";
+          }
+        } else if (!value && value !== 0) {
+          newErrors[field.name] = "Este campo es obligatorio.";
+        }
       }
     });
 
@@ -160,8 +203,8 @@ const handleChange = (e, fieldName) => {
             ref={(el) => (fieldRefs.current[field.name] = el)}
             {...field}
             value={value}
-            error={hasError}
             onChange={(e) => handleChange(e, field.name)}
+            className={hasError ? "border-red-500" : ""}
           />
         );
       case "textarea":
@@ -171,8 +214,8 @@ const handleChange = (e, fieldName) => {
             ref={(el) => (fieldRefs.current[field.name] = el)}
             {...field}
             value={value}
-            error={hasError}
             onChange={(e) => handleChange(e, field.name)}
+            className={hasError ? "border-red-500" : ""}
           />
         );
       case "select":
@@ -182,10 +225,10 @@ const handleChange = (e, fieldName) => {
             ref={(el) => (fieldRefs.current[field.name] = el)}
             {...field}
             value={value}
-            error={hasError}
             onSelect={(selectedValue) =>
               setFormData((prev) => ({ ...prev, [field.name]: selectedValue }))
             }
+            className={hasError ? "border-red-500" : ""}
           />
         );
       case "checkbox":
@@ -195,7 +238,6 @@ const handleChange = (e, fieldName) => {
             ref={(el) => (fieldRefs.current[field.name] = el)}
             {...field}
             checked={value === 1}
-            error={hasError}
             onChange={(e) => handleChange(e, field.name)}
           />
         );
@@ -206,8 +248,8 @@ const handleChange = (e, fieldName) => {
             ref={(el) => (fieldRefs.current[field.name] = el)}
             {...field}
             value={value}
-            error={hasError}
             onChange={(e) => handleChange(e, field.name)}
+            className={hasError ? "border-red-500" : ""}
           />
         );
       case "image":
@@ -216,8 +258,9 @@ const handleChange = (e, fieldName) => {
             key={field.name}
             ref={(el) => (fieldRefs.current[field.name] = el)}
             {...field}
-            error={hasError}
             onChange={(e) => handleFileChange(e, field.name)}
+            error={hasError ? errors[field.name] : null}
+            className={hasError ? "border-red-500" : ""}
           />
         );
       case "map":
@@ -228,26 +271,12 @@ const handleChange = (e, fieldName) => {
             {...field}
             value={value}
             onChange={(location) => handleMapChange(location, field.name)}
+            className={hasError ? "border-red-500" : ""}
           />
         );
       default:
         return null;
     }
-  };
-
-  const handleMapChange = (location, fieldName) => {
-    setFormData((prev) => ({
-      ...prev,
-      [fieldName]: { lat: location.lat, lng: location.lng },
-    }));
-  };
-
-  const handleFileChange = (e, fieldName) => {
-    const file = e.target.files[0];
-    setFormData((prev) => ({
-      ...prev,
-      [fieldName]: file,
-    }));
   };
 
   return (

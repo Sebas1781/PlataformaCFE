@@ -143,7 +143,7 @@ CREATE PROCEDURE sp_insertar_reporte
     @resistenciaTierra NVARCHAR(50),
     @voltajeFuente NVARCHAR(50),
     @voltajeBateria NVARCHAR(50),
-    @resitenciaBateria NVARCHAR(50),
+    @resitenciaBateria NVARCHAR(50), -- Manteniendo el error tipográfico
     @porcentajeBateria NVARCHAR(50),
     @anguloAzimut NVARCHAR(50),
     @placaNomeclatura BIT,
@@ -173,14 +173,18 @@ BEGIN
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        -- Insert en la tabla principal
+        -- Generación automática de nombreReporte combinando direccion, responsable y fechaCreacion
+        DECLARE @nombreReporte NVARCHAR(255);
+        SET @nombreReporte = CONCAT(@direccion, ' - ', @responsable, ' - ', CONVERT(NVARCHAR(20), GETDATE(), 120));
+
+        -- Insert en la tabla principal con nombreReporte generado
         INSERT INTO ReportesInformacionBasica (
             nombreReporte, fechaCreacion, ultimaModificacion,
             tipoMantenimiento, Modelo, responsable, horaInicio, horaTermino,
             licencia, registro, restaurador, Circuito, area, ubicacionMapa, direccion
         )
         VALUES (
-            'Reporte Automático', GETDATE(), GETDATE(),
+            @nombreReporte, GETDATE(), GETDATE(),
             @tipoMantenimiento, @modelo, @responsable, @horaInicio, @horaTermino,
             @licencia, @registro, @restaurador, @circuito, @area, @ubicacionMapa, @direccion
         );
@@ -259,4 +263,97 @@ END
 GO
 
 
+--obtener circuitos:
 
+CREATE PROCEDURE sp_ObtenerNombreCircuito
+    @idCircuito INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT Nombre
+    FROM Circuitos
+    WHERE idCircuito = @idCircuito;
+END
+GO
+
+-- Obtener Antenas
+CREATE PROCEDURE sp_ObtenerAntenas
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT * FROM Antenas;
+END
+GO
+
+-- Obtener CablesLT
+CREATE PROCEDURE sp_ObtenerCablesLT
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT * FROM CablesLT;
+END
+GO
+
+-- Obtener CablesPigtail
+CREATE PROCEDURE sp_ObtenerCablesPigtail
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT * FROM CablesPigtail;
+END
+GO
+
+-- Obtener Canales UCM
+CREATE PROCEDURE sp_ObtenerCanalesUCM
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT * FROM CanalesUCM;
+END
+GO
+
+-- Obtener Frecuencias
+CREATE PROCEDURE sp_ObtenerFrecuencias
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT * FROM Frecuencias;
+END
+GO
+
+-- Obtener Modelos
+CREATE PROCEDURE sp_ObtenerModelos
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT * FROM Modelos;
+END
+GO
+
+-- Obtener Repetidores de Enlace
+CREATE PROCEDURE sp_ObtenerRepetidoresEnlace
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT * FROM RepetidoresEnlace;
+END
+GO
+
+-- Obtener Supresores
+CREATE PROCEDURE sp_ObtenerSupresores
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT * FROM Supresores;
+END
+GO
+
+-- Obtener Usuarios (para el dropdown de representante, solo se ocupa el nombre)
+CREATE PROCEDURE sp_ObtenerUsuariosRepresentantes
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SELECT nombre FROM Usuarios;
+END
+GO

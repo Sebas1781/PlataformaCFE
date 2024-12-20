@@ -50,3 +50,7 @@ coverage/
 # OS generated files
 *.~lock.*
 *.~*#
+
+#Uploads
+uploads/
+
