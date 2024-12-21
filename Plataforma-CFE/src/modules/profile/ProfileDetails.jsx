@@ -12,7 +12,7 @@ const ProfileDetails = () => {
             try {
                 setUserProfile(JSON.parse(userData));
             } catch (error) {
-                console.error("Error al parsear datos del usuario:", error);
+                console.error("Error al escribir los datos del usuario:", error);
             }
         }
     }, []);
@@ -39,14 +39,14 @@ const ProfileDetails = () => {
                 {/* Detalles del perfil */}
                 <div className="mt-6 text-center">
                     <h2 className="text-2xl font-bold text-gray-800">{userProfile?.nombre || "Nombre no disponible"}</h2>
+                    <p className="text-gray-600 font-bold text-sm"> {userProfile?.tipoUsuario === 1 ? "Administrador" : "Usuario" }</p>
                     <p className="text-gray-600 mt-1">Número de Trabajador</p>
                     <p className="text-lg font-medium text-gray-700">{userProfile?.numeroTrabajador || "N/A"}</p>
                 </div>
 
                 {/* Información adicional opcional */}
-                <div className="mt-6">
+                <div className="mt-6 text-center">
                     <h3 className="text-lg font-semibold text-gray-800 mb-2">Información del Perfil</h3>
-                    <p className="text-gray-600 text-sm"> {userProfile?.tipoUsuario === 1 ? "Administrador" : "Usuario" }</p>
                     <p className="text-gray-600 text-sm">
                         Este perfil es de solo lectura. Para realizar cambios, contacte al administrador.
                     </p>

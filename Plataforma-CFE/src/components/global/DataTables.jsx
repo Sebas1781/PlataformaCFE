@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit, FaTrash, FaSearch, FaPrint } from "react-icons/fa";
 
 export const UsersTable = ({
   header = [],
@@ -205,8 +205,6 @@ export const UsersTable = ({
     </div>
   );
 };
-
-
 
 
 export const GenerarTabla = ({ header = [], title = "", description = "", data = [] }) => {
