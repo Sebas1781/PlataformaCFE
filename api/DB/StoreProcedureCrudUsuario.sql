@@ -357,3 +357,19 @@ BEGIN
     SELECT nombre FROM Usuarios;
 END
 GO
+
+--Obtener todos los usuarios para tablas:
+
+CREATE PROCEDURE sp_obtener_usuarios
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        idTrabajador,
+        numeroTrabajador,
+        nombre
+    FROM
+        dbo.Usuarios; -- Asegúrate de que el nombre y esquema de la tabla sean correctos
+END
+GO
