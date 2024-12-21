@@ -526,6 +526,26 @@ api.post('/ObtenerUsuario', async(req, res) =>{
   }
 });  
 
+//Obtener toods los usuarios
+
+api.get('/ObtenerUsuarios', async (req, res) => {
+  const procedureName = 'sp_obtener_usuarios';
+
+  try {
+    const pool = await poolPromise; // Esperar a que la conexión se establezca
+    const request = pool.request();
+
+    // Ejecutar el stored procedure
+    const result = await request.execute(procedureName);
+
+    // Asegúrate de retornar un arreglo siempre
+    res.json(result.recordset || []); // Si no hay usuarios, retorna un arreglo vacío
+  } catch (error) {
+    console.error('Error al ejecutar el Store Procedure:', error);
+    res.status(500).json({ error: 'Error al ejecutar el Store Procedure.' });
+  }
+});
+
 // Actualizar Usuario
 api.post('/ActualizarUsuario', async (req, res) => {
   const procedureName= 'UserUpdate';
