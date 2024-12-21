@@ -277,6 +277,198 @@ api.get('/health-check', (req, res) => {
     res.status(200).json({ message: 'Conexión exitosa con el backend.' });
 });
 
+// ----------------- Modificar Reporte --------------------------
+
+api.put('/modificarReporte', async (req, res) => {
+  // Nombre del SP que actualiza las tablas del reporte
+  const procedureName = 'sp_modificar_reporte';
+
+  // Extraer los campos desde req.body
+  const {
+    id_reporte,
+    tipoMantenimiento,
+    modelo,
+    fecha,
+    horaInicio,
+    horaTermino,
+    responsable,
+    licencia,
+    registro,
+    restaurador,
+    circuito,
+    area,
+    ubicacionMapa, // Este debería llegar como objeto { lat: X, lng: Y }
+    direccion,
+    nsRadioGabinete,
+    potenciaSalida,
+    rssi,
+    umbralRecepcion,
+    frecuencia,
+    rx,
+    tx,
+    cablePigtail,
+    supresor,
+    cableLT,
+    alturaAntena,
+    repetidorEnlace,
+    canalUCM,
+    fotografiasMantto,
+    medicionRF,
+    medicionFuenteCD,
+    medicionBateria,
+    limpieza,
+    ajusteTornilleria,
+    cambioAntena,
+    impermeabilizacionConectores,
+    redireccionamientoAntena,
+    cambioLT,
+    cambioSupresor,
+    cambioRadio,
+    cambioPigtail,
+    cambioConectores,
+    potenciaRadio,
+    potenciaIncidente,
+    potenciaReflejada,
+    vswr,
+    voltajeAcometida,
+    resistenciaTierra,
+    voltajeFuente,
+    voltajeBateria,
+    resistenciaBateria,
+    porcentajeBateria,
+    anguloAzimut,
+    placaNomenclatura,
+    selladoGabinete,
+    protectorAntifauna,
+    cuchillasByPass,
+    cuchillasLaterale,
+    bajanteTierra,
+    terminalPAT,
+    apartarrayos,
+    cableRF,
+    calibreBajante,
+    Observaciones,
+    configuracionRadio,
+    imagenEstructura,
+    imagenGabinete,
+    imagenRadio,
+    imagenSupresor,
+    imagenRestaurador,
+    imagenTerminalTierra,
+    imagenBajanteTierra,
+    imagenPlaca,
+    imagenAdicional
+  } = req.body;
+
+  try {
+    const request = SysConn.request();
+
+    // Asignar los parámetros, ajustando los tipos según el SP
+    request.input('id_reporte', mssql.Int, id_reporte);
+    request.input('tipoMantenimiento', mssql.NVarChar(50), tipoMantenimiento);
+    request.input('modelo', mssql.NVarChar(100), modelo);
+    request.input('fecha', mssql.Date, fecha);
+    request.input('horaInicio', mssql.NVarChar(20), horaInicio);
+    request.input('horaTermino', mssql.NVarChar(20), horaTermino);
+    request.input('responsable', mssql.NVarChar(100), responsable);
+    request.input('licencia', mssql.NVarChar(20), licencia);
+    request.input('registro', mssql.NVarChar(20), registro);
+    request.input('restaurador', mssql.NVarChar(20), restaurador);
+    request.input('circuito', mssql.NVarChar(100), circuito);
+    request.input('area', mssql.NVarChar(100), area);
+    request.input('ubicacionMapa', mssql.NVarChar(150), JSON.stringify(ubicacionMapa));
+    request.input('direccion', mssql.NVarChar(150), direccion);
+    request.input('nsRadioGabinete', mssql.NVarChar(100), nsRadioGabinete);
+    request.input('potenciaSalida', mssql.NVarChar(100), potenciaSalida);
+    request.input('rssi', mssql.NVarChar(10), String(rssi));
+    request.input('umbralRecepcion', mssql.NVarChar(10), String(umbralRecepcion));
+    request.input('frecuencia', mssql.NVarChar(100), frecuencia);
+    request.input('rx', mssql.NVarChar(50), rx);
+    request.input('tx', mssql.NVarChar(50), tx);
+    request.input('cablePigtail', mssql.NVarChar(100), cablePigtail);
+    request.input('supresor', mssql.NVarChar(100), supresor);
+    request.input('cableLT', mssql.NVarChar(100), cableLT);
+    request.input('alturaAntena', mssql.NVarChar(50), alturaAntena);
+    request.input('repetidorEnlace', mssql.NVarChar(100), repetidorEnlace);
+    request.input('canalUCM', mssql.NVarChar(100), canalUCM);
+    request.input('fotografiasMantto', mssql.Bit, fotografiasMantto);
+    request.input('medicionRF', mssql.Bit, medicionRF);
+    request.input('medicionFuenteCD', mssql.Bit, medicionFuenteCD);
+    request.input('medicionBateria', mssql.Bit, medicionBateria);
+    request.input('limpieza', mssql.Bit, limpieza);
+    request.input('ajusteTornilleria', mssql.Bit, ajusteTornilleria);
+    request.input('cambioAntena', mssql.Bit, cambioAntena);
+    request.input('impermeabilizacionConectores', mssql.Bit, impermeabilizacionConectores);
+    request.input('redireccionamientoAntena', mssql.Bit, redireccionamientoAntena);
+    request.input('cambioLT', mssql.Bit, cambioLT);
+    request.input('cambioSupresor', mssql.Bit, cambioSupresor);
+    request.input('cambioRadio', mssql.Bit, cambioRadio);
+    request.input('cambioPigtail', mssql.Bit, cambioPigtail);
+    request.input('cambioConectores', mssql.Bit, cambioConectores);
+    request.input('potenciaRadio', mssql.NVarChar(50), potenciaRadio);
+    request.input('potenciaIncidente', mssql.NVarChar(50), potenciaIncidente);
+    request.input('potenciaReflejada', mssql.NVarChar(50), potenciaReflejada);
+    request.input('vswr', mssql.NVarChar(50), vswr);
+    request.input('voltajeAcometida', mssql.NVarChar(50), voltajeAcometida);
+    request.input('resistenciaTierra', mssql.NVarChar(50), resistenciaTierra);
+    request.input('voltajeFuente', mssql.NVarChar(50), voltajeFuente);
+    request.input('voltajeBateria', mssql.NVarChar(50), voltajeBateria);
+    request.input('resistenciaBateria', mssql.NVarChar(50), resistenciaBateria);
+    request.input('porcentajeBateria', mssql.NVarChar(50), porcentajeBateria);
+    request.input('anguloAzimut', mssql.NVarChar(50), anguloAzimut);
+    request.input('placaNomenclatura', mssql.Bit, placaNomenclatura);
+    request.input('selladoGabinete', mssql.Bit, selladoGabinete);
+    request.input('protectorAntifauna', mssql.Bit, protectorAntifauna);
+    request.input('cuchillasByPass', mssql.Bit, cuchillasByPass);
+    request.input('cuchillasLaterale', mssql.Bit, cuchillasLaterale);
+    request.input('bajanteTierra', mssql.Bit, bajanteTierra);
+    request.input('terminalPAT', mssql.Bit, terminalPAT);
+    request.input('apartarrayos', mssql.Bit, apartarrayos);
+    request.input('cableRF', mssql.Bit, cableRF);
+    request.input('calibreBajante', mssql.NVarChar(100), calibreBajante);
+    request.input('Observaciones', mssql.NVarChar(mssql.MAX), Observaciones);
+    request.input('configuracionRadio', mssql.NVarChar(mssql.MAX), configuracionRadio);
+    request.input('imagenEstructura', mssql.NVarChar(mssql.MAX), imagenEstructura);
+    request.input('imagenGabinete', mssql.NVarChar(mssql.MAX), imagenGabinete);
+    request.input('imagenRadio', mssql.NVarChar(mssql.MAX), imagenRadio);
+    request.input('imagenSupresor', mssql.NVarChar(mssql.MAX), imagenSupresor);
+    request.input('imagenRestaurador', mssql.NVarChar(mssql.MAX), imagenRestaurador);
+    request.input('imagenTerminalTierra', mssql.NVarChar(mssql.MAX), imagenTerminalTierra);
+    request.input('imagenBajanteTierra', mssql.NVarChar(mssql.MAX), imagenBajanteTierra);
+    request.input('imagenPlaca', mssql.NVarChar(mssql.MAX), imagenPlaca);
+    request.input('imagenAdicional', mssql.NVarChar(mssql.MAX), imagenAdicional);
+
+    const results = await request.execute(procedureName);
+
+    res.json({ message: 'Reporte modificado exitosamente', id_reporte: id_reporte });
+  } catch (error) {
+    console.error('Error al ejecutar el Store Procedure:', error);
+    res.status(500).json({ error: 'Error al ejecutar el Store Procedure' });
+  }
+});
+
+
+//---------------------------- Eliminar Reporte ---------------------------
+
+api.delete('/eliminarReporte/:id', async (req, res) => {
+  const procedureName = 'sp_eliminar_reporte';
+  const { id } = req.params;
+
+  try {
+    const request = SysConn.request();
+
+    // Asignar el parámetro para el ID del reporte
+    request.input('id_reporte', mssql.Int, id);
+
+    const results = await request.execute(procedureName);
+
+    res.json({ message: 'Reporte eliminado exitosamente', id_reporte: id });
+  } catch (error) {
+    console.error('Error al ejecutar el Store Procedure:', error);
+    res.status(500).json({ error: 'Error al ejecutar el Store Procedure' });
+  }
+});
+
 
 /*-----------------------------------------------------
     End Points by Carlos

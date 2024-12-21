@@ -263,6 +263,244 @@ END
 GO
 
 
+-------- Modificar reporte ------------
+
+CREATE PROCEDURE sp_modificar_reporte
+    @id_reporte INT,
+    @tipoMantenimiento NVARCHAR(50),
+    @modelo NVARCHAR(100),
+    @fecha DATE,
+    @horaInicio NVARCHAR(20),
+    @horaTermino NVARCHAR(20),
+    @responsable NVARCHAR(100),
+    @licencia NVARCHAR(20),
+    @registro NVARCHAR(20),
+    @restaurador NVARCHAR(20),
+    @circuito NVARCHAR(100),
+    @area NVARCHAR(100),
+    @ubicacionMapa NVARCHAR(150),
+    @direccion NVARCHAR(150),
+    @nsRadioGabinete NVARCHAR(100),
+    @potenciaSalida NVARCHAR(100),
+    @rssi NVARCHAR(10),
+    @umbralRecepcion NVARCHAR(10),
+    @frecuencia NVARCHAR(100),
+    @rx NVARCHAR(50),
+    @tx NVARCHAR(50),
+    @cablePigtail NVARCHAR(100),
+    @supresor NVARCHAR(100),
+    @cableLT NVARCHAR(100),
+    @alturaAntena NVARCHAR(50),
+    @repetidorEnlace NVARCHAR(100),
+    @canalUCM NVARCHAR(100),
+    @fotografiasMantto BIT,
+    @medicionRF BIT,
+    @medicionFuenteCD BIT,
+    @medicionBateria BIT,
+    @limpieza BIT,
+    @ajusteTornilleria BIT,
+    @cambioAntena BIT,
+    @impermeabilizacionConectores BIT,
+    @redireccionamientoAntena BIT,
+    @cambioLT BIT,
+    @cambioSupresor BIT,
+    @cambioRadio BIT,
+    @cambioPigtail BIT,
+    @cambioConectores BIT,
+    @potenciaRadio NVARCHAR(50),
+    @potenciaIncidente NVARCHAR(50),
+    @potenciaReflejada NVARCHAR(50),
+    @vswr NVARCHAR(50),
+    @voltajeAcometida NVARCHAR(50),
+    @resistenciaTierra NVARCHAR(50),
+    @voltajeFuente NVARCHAR(50),
+    @voltajeBateria NVARCHAR(50),
+    @resistenciaBateria NVARCHAR(50),
+    @porcentajeBateria NVARCHAR(50),
+    @anguloAzimut NVARCHAR(50),
+    @placaNomenclatura BIT,
+    @selladoGabinete BIT,
+    @protectorAntifauna BIT,
+    @cuchillasByPass BIT,
+    @cuchillasLaterale BIT,
+    @bajanteTierra BIT,
+    @terminalPAT BIT,
+    @apartarrayos BIT,
+    @cableRF BIT,
+    @calibreBajante NVARCHAR(100),
+    @Observaciones NVARCHAR(MAX),
+    @configuracionRadio NVARCHAR(MAX),
+    @imagenEstructura NVARCHAR(MAX),
+    @imagenGabinete NVARCHAR(MAX),
+    @imagenRadio NVARCHAR(MAX),
+    @imagenSupresor NVARCHAR(MAX),
+    @imagenRestaurador NVARCHAR(MAX),
+    @imagenTerminalTierra NVARCHAR(MAX),
+    @imagenBajanteTierra NVARCHAR(MAX),
+    @imagenPlaca NVARCHAR(MAX),
+    @imagenAdicional NVARCHAR(MAX)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        -- Actualizar la tabla principal
+        UPDATE ReportesInformacionBasica
+        SET
+            tipoMantenimiento = @tipoMantenimiento,
+            modelo = @modelo,
+            fecha = @fecha,
+            horaInicio = @horaInicio,
+            horaTermino = @horaTermino,
+            responsable = @responsable,
+            licencia = @licencia,
+            registro = @registro,
+            restaurador = @restaurador,
+            circuito = @circuito,
+            area = @area,
+            ubicacionMapa = @ubicacionMapa,
+            direccion = @direccion
+        WHERE id_reporte = @id_reporte;
+
+        -- Actualizar las demás tablas por el ID
+        UPDATE ReportesSistemaComunicaciones
+        SET
+            nsRadioGabinete = @nsRadioGabinete,
+            potenciaSalida = @potenciaSalida,
+            rss1 = @rssi,
+            umbralRecepcion = @umbralRecepcion,
+            frecuencia = @frecuencia,
+            rx = @rx,
+            tx = @tx,
+            CablePigtail = @cablePigtail,
+            Supresor = @supresor,
+            CableLT = @cableLT
+        WHERE id_reporte = @id_reporte;
+
+        UPDATE ReportesMantenimiento
+        SET
+            alturaAntena = @alturaAntena,
+            RepetidorEnlace = @repetidorEnlace,
+            CanalUCM = @canalUCM,
+            fotografiasMantto = @fotografiasMantto,
+            medicionRF = @medicionRF,
+            medicionFuenteCD = @medicionFuenteCD,
+            medicionBateria = @medicionBateria,
+            limpieza = @limpieza,
+            ajusteTornilleria = @ajusteTornilleria,
+            cambioAntena = @cambioAntena,
+            impermeabilizacionConectores = @impermeabilizacionConectores,
+            redireccionamientoAntena = @redireccionamientoAntena,
+            cambioLT = @cambioLT,
+            cambioSupresor = @cambioSupresor,
+            cambioRadio = @cambioRadio,
+            cambioPigtail = @cambioPigtail,
+            cambioConectores = @cambioConectores
+        WHERE id_reporte = @id_reporte;
+
+        UPDATE ReportesMediciones
+        SET
+            potenciaRadio = @potenciaRadio,
+            potenciaIncidente = @potenciaIncidente,
+            potenciaReflejada = @potenciaReflejada,
+            vswr = @vswr,
+            voltajeAcometida = @voltajeAcometida,
+            resistenciaTierra = @resistenciaTierra,
+            voltajeFuente = @voltajeFuente,
+            voltajeBateria = @voltajeBateria,
+            resistenciaBateria = @resistenciaBateria,
+            porcentajeBateria = @porcentajeBateria,
+            anguloAzimut = @anguloAzimut
+        WHERE id_reporte = @id_reporte;
+
+        UPDATE ReportesInstalacion
+        SET
+            placaNomenclatura = @placaNomenclatura,
+            selladoGabinete = @selladoGabinete,
+            protectorAntifauna = @protectorAntifauna,
+            cuchillasByPass = @cuchillasByPass,
+            cuchillasLaterale = @cuchillasLaterale,
+            bajanteTierra = @bajanteTierra,
+            terminalPAT = @terminalPAT,
+            apartarrayos = @apartarrayos,
+            cableRF = @cableRF,
+            calibreBajante = @calibreBajante,
+            Observaciones = @Observaciones,
+            configuracionRadio = @configuracionRadio
+        WHERE id_reporte = @id_reporte;
+
+        UPDATE ReportesImagenes
+        SET
+            imagenEstructura = @imagenEstructura,
+            imagenGabinete = @imagenGabinete,
+            imagenRadio = @imagenRadio,
+            imagenSupresor = @imagenSupresor,
+            imagenRestaurador = @imagenRestaurador,
+            imagenTerminalTierra = @imagenTerminalTierra,
+            imagenBajanteTierra = @imagenBajanteTierra,
+            imagenPlaca = @imagenPlaca,
+            imagenAdicional = @imagenAdicional
+        WHERE id_reporte = @id_reporte;
+
+        COMMIT TRANSACTION;
+
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        THROW;
+    END CATCH
+END;
+GO
+
+-- ------------- Eliminar Reporte ------------------
+CREATE PROCEDURE sp_eliminar_reporte
+    @id_reporte INT
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRANSACTION;
+
+        -- Eliminar de ReportesImagenes
+        DELETE FROM ReportesImagenes
+        WHERE id_reporte = @id_reporte;
+
+        -- Eliminar de ReportesInstalacion
+        DELETE FROM ReportesInstalacion
+        WHERE id_reporte = @id_reporte;
+
+        -- Eliminar de ReportesMediciones
+        DELETE FROM ReportesMediciones
+        WHERE id_reporte = @id_reporte;
+
+        -- Eliminar de ReportesMantenimiento
+        DELETE FROM ReportesMantenimiento
+        WHERE id_reporte = @id_reporte;
+
+        -- Eliminar de ReportesSistemaComunicaciones
+        DELETE FROM ReportesSistemaComunicaciones
+        WHERE id_reporte = @id_reporte;
+
+        -- Eliminar de ReportesInformacionBasica
+        DELETE FROM ReportesInformacionBasica
+        WHERE id_reporte = @id_reporte;
+
+        COMMIT TRANSACTION;
+
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0
+            ROLLBACK TRANSACTION;
+
+        THROW; -- Re-lanza el error para que el cliente pueda capturarlo
+    END CATCH
+END;
+GO
 --obtener circuitos:
 
 CREATE PROCEDURE sp_ObtenerNombreCircuito
