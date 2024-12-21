@@ -13,9 +13,7 @@ import Login from "./components/includes/Login";
 import UserTables from './modules/users/UserTables';
 
 function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(() => {
-        return localStorage.getItem("isAuthenticated") === "true";
-    });
+    const [isAuthenticated, setIsAuthenticated] = useState(true); // Fijar como true para desactivar el login temporalmente
     const [userType, setUserType] = useState(() => {
         return localStorage.getItem("userType") || null;
     });
@@ -28,11 +26,11 @@ function App() {
     }, [isAuthenticated, userType]);
 
     const PrivateRoute = ({ children }) => {
-        return isAuthenticated ? children : <Navigate to="/login" replace />;
+        return children; // Permitir acceso sin autenticar
     };
 
     const PublicRoute = ({ children }) => {
-        return !isAuthenticated ? children : <Navigate to="/" replace />;
+        return children; // No redirigir, dejar que se muestre el contenido de la ruta pública
     };
 
     return (
