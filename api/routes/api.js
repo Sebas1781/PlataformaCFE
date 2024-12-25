@@ -361,7 +361,8 @@ api.put('/modificarReporte', async (req, res) => {
   } = req.body;
 
   try {
-    const request = SysConn.request();
+    const pool = await poolPromise; // Esperar a que la conexión se establezca
+    const request = pool.request();
 
     // Asignar los parámetros, ajustando los tipos según el SP
     request.input('id_reporte', mssql.Int, id_reporte);
@@ -450,25 +451,31 @@ api.put('/modificarReporte', async (req, res) => {
 
 //---------------------------- Eliminar Reporte ---------------------------
 
-api.delete('/eliminarReporte/:id', async (req, res) => {
+api.post('/eliminarReporte', async (req, res) => {
   const procedureName = 'sp_eliminar_reporte';
-  const { id } = req.params;
+  const { id } = req.body; // Extraer el id desde el cuerpo de la solicitud
 
   try {
-    const request = SysConn.request();
+    if (!id) {
+      return res.status(400).json({ error: 'El parámetro id es obligatorio.' });
+    }
+
+    const pool = await poolPromise; // Esperar a que la conexión se establezca
+    const request = pool.request();
 
     // Asignar el parámetro para el ID del reporte
     request.input('id_reporte', mssql.Int, id);
 
-    const results = await request.execute(procedureName);
+    // Ejecutar el procedimiento almacenado
+    await request.execute(procedureName);
 
+    // Responder con éxito
     res.json({ message: 'Reporte eliminado exitosamente', id_reporte: id });
   } catch (error) {
     console.error('Error al ejecutar el Store Procedure:', error);
-    res.status(500).json({ error: 'Error al ejecutar el Store Procedure' });
+    res.status(500).json({ error: 'Error interno al eliminar el reporte.' });
   }
 });
-
 
 /*-----------------------------------------------------
     End Points by Carlos
